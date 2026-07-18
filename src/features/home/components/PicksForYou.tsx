@@ -1,0 +1,142 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
+import { ChevronRight, Heart } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+
+const products = [
+  {
+    id: '1',
+    slug: 'isabel-wide-leg-scrub-pant-celery',
+    name: 'Isabel High-Rise Wide-Leg Scrub Pant',
+    price: 58.0,
+    image: '/images/product-pants.png',
+  },
+  {
+    id: '2',
+    slug: 'isabel-wide-leg-scrub-pant-purple',
+    name: 'Isabel High-Rise Wide-Leg Scrub Pant',
+    price: 58.0,
+    image: '/images/product-pants.png',
+  },
+  {
+    id: '3',
+    slug: 'isabel-wide-leg-scrub-pant-black',
+    name: 'Isabel High-Rise Wide-Leg Scrub Pant',
+    price: 58.0,
+    image: '/images/product-pants.png',
+  },
+  {
+    id: '4',
+    slug: 'isabel-wide-leg-scrub-pant-navy',
+    name: 'Isabel High-Rise Wide-Leg Scrub Pant',
+    price: 58.0,
+    image: '/images/product-pants.png',
+  },
+  {
+    id: '5',
+    slug: 'rafaela-oversized-scrub-top',
+    name: 'Rafaela Oversized Scrub Top',
+    price: 42.0,
+    image: '/images/product-top.png',
+  },
+  {
+    id: '6',
+    slug: 'leon-three-pocket-scrub-top',
+    name: 'Leon™ Three-Pocket Scrub Top',
+    price: 48.0,
+    image: '/images/product-top.png',
+  },
+];
+
+export function PicksForYou() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    slidesToScroll: 1,
+    containScroll: 'trimSnaps',
+    dragFree: true,
+  });
+
+  const [canScrollNext, setCanScrollNext] = useState(true);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect]);
+
+  return (
+    <section className="py-16 sm:py-24 bg-white overflow-hidden">
+      <div className="container-premium px-4 sm:px-8 mb-10">
+        <h2 className="font-heading font-black text-3xl sm:text-4xl tracking-wide text-black uppercase">
+          Picks For You
+        </h2>
+      </div>
+
+      <div className="relative">
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-4 sm:gap-6">
+            {products.map((product, index) => (
+              <div
+                key={product.id}
+                className={`flex-[0_0_75%] sm:flex-[0_0_40%] md:flex-[0_0_30%] lg:flex-[0_0_24%] xl:flex-[0_0_20%] min-w-0 group ${
+                  index === 0 ? 'ml-4 sm:ml-8 lg:ml-16' : ''
+                } ${index === products.length - 1 ? 'mr-4 sm:mr-8 lg:mr-16' : ''}`}
+              >
+                <Link to={`/products/${product.slug}`} className="block relative">
+                  {/* Image */}
+                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-neutral-100 mb-4 rounded-none">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {/* Wishlist heart */}
+                    <button
+                      className="absolute top-4 right-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full text-black/70 hover:text-black transition-colors"
+                      aria-label="Add to wishlist"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                    >
+                      <Heart size={18} strokeWidth={2} />
+                    </button>
+                  </div>
+                </Link>
+
+                {/* Product info */}
+                <Link to={`/products/${product.slug}`} className="block">
+                  <p className="text-[13px] sm:text-[14px] font-bold text-black tracking-wide leading-snug line-clamp-2 mb-1 uppercase">
+                    {product.name}
+                  </p>
+                  <p className="text-[13px] sm:text-[14px] text-neutral-600">
+                    ${product.price.toFixed(2)}
+                  </p>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Scroll next button */}
+        {canScrollNext && (
+          <button
+            onClick={scrollNext}
+            className="absolute right-4 sm:right-8 top-[35%] -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center hover:scale-105 transition-transform border border-neutral-100"
+            aria-label="Scroll right"
+          >
+            <ChevronRight size={24} strokeWidth={2} />
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}

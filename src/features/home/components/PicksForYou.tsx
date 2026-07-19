@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronRight, Heart } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
 
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
@@ -93,11 +94,17 @@ export function PicksForYou() {
 
   return (
     <section className="py-16 sm:py-24 bg-white overflow-hidden">
-      <div className="container-premium px-4 sm:px-8 mb-10">
+      <motion.div 
+        className="container-premium px-4 sm:px-8 mb-10"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
         <h2 className="font-heading font-black text-3xl sm:text-4xl tracking-wide text-black uppercase">
           Picks For You
         </h2>
-      </div>
+      </motion.div>
 
       <div className="relative">
         <div className="overflow-hidden" ref={emblaRef}>
@@ -117,6 +124,7 @@ export function PicksForYou() {
                       alt={product.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
+                      decoding="async"
                     />
                     {/* Wishlist heart */}
                     <button

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
 
 export function HeroSection() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -13,6 +14,8 @@ export function HeroSection() {
       <img
         src="/images/hero.png"
         alt="Healthcare professionals in premium scrubs"
+        loading="eager"
+        decoding="async"
         className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
           isImageLoaded ? 'opacity-100' : 'opacity-0'
         } z-0`}
@@ -23,7 +26,13 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-black/30 z-10" />
 
       {/* Text Overlay */}
-      <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 w-full max-w-4xl mx-auto mt-16 lg:mt-24">
+      <motion.div 
+        className="relative z-20 flex flex-col items-center justify-center text-center px-4 sm:px-8 w-full max-w-4xl mx-auto mt-16 lg:mt-24"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         <h1 className="font-heading font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-[0.04em] text-white uppercase leading-none mb-4 drop-shadow-lg">
           IN THE MIX
         </h1>
@@ -33,11 +42,15 @@ export function HeroSection() {
         </p>
 
         <Link to="/collections/women">
-          <button className="bg-white text-black text-[13px] font-bold tracking-[0.15em] uppercase px-10 py-4 hover:bg-neutral-200 transition-colors duration-300">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white text-black text-[13px] font-bold tracking-[0.15em] uppercase px-10 py-4 hover:bg-neutral-200 transition-colors duration-300"
+          >
             Shop Celery • Deep Purple
-          </button>
+          </motion.button>
         </Link>
-      </div>
+      </motion.div>
     </section>
   );
 }

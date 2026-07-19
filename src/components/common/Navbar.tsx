@@ -211,11 +211,8 @@ export function Navbar() {
             </button>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-1.5">
-              <span className="text-[20px] leading-none">+</span>
-              <span className="font-heading font-black text-[20px] tracking-[0.14em] uppercase text-black select-none">
-                FLAIRVIGO
-              </span>
+            <Link to="/" className="flex items-center h-full py-1">
+              <img src="/images/logo.png" alt="Flairvigo" className="h-full w-auto object-contain" />
             </Link>
           </div>
 
@@ -369,9 +366,9 @@ export function Navbar() {
             >
               {/* Header */}
               <div className="h-[60px] px-5 flex justify-between items-center border-b border-neutral-100">
-                <span className="font-heading font-black text-lg tracking-[0.18em] uppercase">
-                  FLAIRVIGO
-                </span>
+                <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+                  <img src="/images/logo.png" alt="Flairvigo" className="h-8 w-auto object-contain" />
+                </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="p-2 -mr-2 text-neutral-500 hover:text-black transition-colors"

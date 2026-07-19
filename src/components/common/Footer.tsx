@@ -50,46 +50,44 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-[#2a2a2a] text-white pt-16 pb-8 font-sans">
+    <footer className="bg-ivory text-charcoal pt-16 pb-8 font-sans border-t border-neutral-200">
       <div className="container-premium px-4 sm:px-8">
         <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-8 xl:gap-16 mb-20">
           
           {/* Logo & Newsletter Section */}
           <div className="lg:w-[35%] flex flex-col gap-6">
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl leading-tight tracking-[0.1em] uppercase">
-              AWESOME
-              <br />
-              HUMANS
-            </h2>
-            <p className="font-heading font-bold text-lg tracking-[0.15em] uppercase text-white/90 mb-2">
+            <Link to="/" className="inline-block w-48 mb-2">
+              <img src="/images/logo.png" alt="Flairvigo" className="w-full h-auto object-contain" />
+            </Link>
+            <p className="font-heading font-bold text-lg tracking-[0.15em] uppercase text-neutral-600 mb-2">
               #WEARFLAIRVIGO
             </p>
             
             {/* Newsletter */}
             <div className="mt-4 mb-8">
-              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-charcoal">
                 SIGN UP FOR 15% OFF
               </h4>
               <form className="flex w-full max-w-sm" onSubmit={(e) => e.preventDefault()}>
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="bg-transparent border border-white/30 text-white px-4 py-3 text-[13px] w-full focus:outline-none focus:border-white transition-colors"
+                  className="bg-transparent border border-neutral-300 text-charcoal px-4 py-3 text-[13px] w-full focus:outline-none focus:border-charcoal transition-colors placeholder:text-neutral-400"
                 />
-                <button type="submit" className="bg-white text-black px-6 py-3 text-[12px] font-bold tracking-wider uppercase hover:bg-neutral-200 transition-colors">
+                <button type="submit" className="bg-charcoal text-ivory px-6 py-3 text-[12px] font-bold tracking-wider uppercase hover:bg-neutral-800 transition-colors">
                   Join
                 </button>
               </form>
             </div>
 
             <div className="flex gap-5">
-              <a href="#" className="text-white/60 hover:text-white transition-colors">
+              <a href="#" className="text-neutral-500 hover:text-charcoal transition-colors">
                 <FaInstagram size={22} />
               </a>
-              <a href="#" className="text-white/60 hover:text-white transition-colors">
+              <a href="#" className="text-neutral-500 hover:text-charcoal transition-colors">
                 <FaTwitter size={22} />
               </a>
-              <a href="#" className="text-white/60 hover:text-white transition-colors">
+              <a href="#" className="text-neutral-500 hover:text-charcoal transition-colors">
                 <FaYoutube size={22} />
               </a>
             </div>
@@ -100,13 +98,13 @@ export function Footer() {
             {/* GET HELP Column */}
             <div className="flex flex-col gap-6">
               <div>
-                <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+                <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-charcoal">
                   GET HELP
                 </h4>
                 <ul className="flex flex-col gap-3">
                   {getHelpLinks.map((link) => (
                     <li key={link.name}>
-                      <Link to={link.path} className="text-[12px] text-white/70 hover:text-white transition-colors">
+                      <Link to={link.path} className="text-[12px] text-neutral-600 hover:text-charcoal transition-colors">
                         {link.name}
                       </Link>
                     </li>
@@ -114,22 +112,22 @@ export function Footer() {
                 </ul>
               </div>
               <div className="mt-2">
-                <p className="text-[12px] text-white/70 mb-1">424-500-8209</p>
-                <p className="text-[10px] text-white/50 leading-tight mb-4">
+                <p className="text-[12px] text-neutral-600 mb-1">424-500-8209</p>
+                <p className="text-[10px] text-neutral-500 leading-tight mb-4">
                   Call or Text<br />
                   5am to 8pm PST<br />
                   Monday to Friday
                 </p>
                 
-                <p className="text-[12px] text-white/70 mb-1">+1-888-462-1901</p>
-                <p className="text-[10px] text-white/50 leading-tight mb-4">
+                <p className="text-[12px] text-neutral-600 mb-1">+1-888-462-1901</p>
+                <p className="text-[10px] text-neutral-500 leading-tight mb-4">
                   Call us Toll Free<br />
                   5am to 8pm PST<br />
                   Monday to Friday
                 </p>
                 
-                <p className="text-[12px] text-white/70 mb-1">Chat with Us</p>
-                <p className="text-[10px] text-white/50 leading-tight">
+                <p className="text-[12px] text-neutral-600 mb-1">Chat with Us</p>
+                <p className="text-[10px] text-neutral-500 leading-tight">
                   5am to 8pm PST<br />
                   Monday to Friday
                 </p>
@@ -139,13 +137,13 @@ export function Footer() {
             {/* OUR COMPANY & GUIDES Column */}
             <div className="flex flex-col gap-8">
               <div>
-                <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+                <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-charcoal">
                   OUR COMPANY
                 </h4>
                 <ul className="flex flex-col gap-3">
                   {companyLinks.map((link) => (
                     <li key={link.name}>
-                      <Link to={link.path} className="text-[12px] text-white/70 hover:text-white transition-colors">
+                      <Link to={link.path} className="text-[12px] text-neutral-600 hover:text-charcoal transition-colors">
                         {link.name}
                       </Link>
                     </li>
@@ -153,13 +151,13 @@ export function Footer() {
                 </ul>
               </div>
               <div>
-                <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+                <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-charcoal">
                   GUIDES
                 </h4>
                 <ul className="flex flex-col gap-3">
                   {guidesLinks.map((link) => (
                     <li key={link.name}>
-                      <Link to={link.path} className="text-[12px] text-white/70 hover:text-white transition-colors">
+                      <Link to={link.path} className="text-[12px] text-neutral-600 hover:text-charcoal transition-colors">
                         {link.name}
                       </Link>
                     </li>
@@ -170,13 +168,13 @@ export function Footer() {
 
             {/* MORE INFO Column */}
             <div>
-              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-charcoal">
                 MORE INFO
               </h4>
               <ul className="flex flex-col gap-3">
                 {infoLinks.map((link) => (
                   <li key={link.name}>
-                    <Link to={link.path} className="text-[12px] text-white/70 hover:text-white transition-colors">
+                    <Link to={link.path} className="text-[12px] text-neutral-600 hover:text-charcoal transition-colors">
                       {link.name}
                     </Link>
                   </li>
@@ -186,19 +184,19 @@ export function Footer() {
 
             {/* LEGAL Column */}
             <div>
-              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-charcoal">
                 LEGAL
               </h4>
               <ul className="flex flex-col gap-3">
                 {legalLinks.map((link) => (
                   <li key={link.name}>
-                    <Link to={link.path} className="text-[12px] text-white/70 hover:text-white transition-colors">
+                    <Link to={link.path} className="text-[12px] text-neutral-600 hover:text-charcoal transition-colors">
                       {link.name}
                     </Link>
                   </li>
                 ))}
                 <li>
-                  <Link to="/privacy" className="text-[12px] text-white/70 hover:text-white transition-colors flex items-center gap-1.5">
+                  <Link to="/privacy" className="text-[12px] text-neutral-600 hover:text-charcoal transition-colors flex items-center gap-1.5">
                     Your Privacy Choices 
                     <span className="inline-flex items-center justify-center w-6 h-3 bg-blue-500 rounded-full">
                       <span className="w-2.5 h-2.5 bg-white rounded-full ml-auto mr-px"></span>
@@ -212,22 +210,22 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10 pt-6 mt-12 relative">
+      <div className="border-t border-neutral-200 pt-6 mt-12 relative">
         <div className="container-premium px-4 sm:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="flex flex-col gap-2">
-            <p className="text-[10px] text-white/60 tracking-[0.1em] uppercase font-bold">
+            <p className="text-[10px] text-neutral-500 tracking-[0.1em] uppercase font-bold">
               &copy; {new Date().getFullYear()} FLAIRVIGO, INC. ALL RIGHTS RESERVED
             </p>
-            <div className="flex gap-2 text-[10px] text-white/50">
-              <Link to="/terms" className="hover:text-white transition-colors">Terms of Use</Link>
+            <div className="flex gap-2 text-[10px] text-neutral-500">
+              <Link to="/terms" className="hover:text-charcoal transition-colors">Terms of Use</Link>
               <span>•</span>
-              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/privacy" className="hover:text-charcoal transition-colors">Privacy Policy</Link>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
             <img src="https://flagcdn.com/w40/us.png" alt="US Flag" className="w-5 h-5 object-cover rounded-full border border-white/20" />
-            <span className="text-[11px] text-white/80 font-bold tracking-wider uppercase">
+            <span className="text-[11px] text-neutral-600 font-bold tracking-wider uppercase">
               UNITED STATES | ENGLISH
             </span>
           </div>

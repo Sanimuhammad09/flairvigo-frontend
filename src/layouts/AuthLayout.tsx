@@ -34,8 +34,8 @@ export function AuthLayout() {
           >
             <ArrowLeft size={22} strokeWidth={1.5} />
           </Link>
-          <Link to="/" className="font-heading font-black text-2xl tracking-[0.2em] uppercase text-charcoal">
-            Flairvigo
+          <Link to="/">
+            <img src="/images/logo.png" alt="Flairvigo" className="h-16 w-auto object-contain" />
           </Link>
         </header>
 

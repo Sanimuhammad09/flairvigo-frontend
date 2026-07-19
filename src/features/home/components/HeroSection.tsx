@@ -6,10 +6,10 @@ export function HeroSection() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
-    <section className="relative w-full h-[85vh] min-h-[600px] overflow-hidden bg-[#8e8e82] flex items-center justify-center">
+    <section className="relative w-full h-[85vh] min-h-[600px] overflow-hidden bg-ivory flex items-center justify-center">
       {/* Full-width Background Image */}
       {!isImageLoaded && (
-        <div className="absolute inset-0 bg-[#8e8e82] animate-pulse z-0" />
+        <div className="absolute inset-0 bg-ivory animate-pulse z-0" />
       )}
       <img
         src="/images/hero.png"

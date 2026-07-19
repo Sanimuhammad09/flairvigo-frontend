@@ -211,8 +211,8 @@ export function Navbar() {
             </button>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center h-full py-1">
-              <img src="/images/logo.png" alt="Flairvigo" className="h-full w-auto object-contain" />
+            <Link to="/" className="flex items-center">
+              <img src="/images/logo.png" alt="Flairvigo" className="h-10 md:h-12 w-auto object-contain" />
             </Link>
           </div>
 

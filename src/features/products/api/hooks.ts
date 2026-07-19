@@ -72,10 +72,10 @@ export function useProducts(filters: ProductFilters = {}) {
           params.set(key, String(value));
         }
       });
-      const { data } = await api.get<{ data: PaginatedResponse<Product> }>(
+      const { data } = await api.get<PaginatedResponse<Product>>(
         `/products?${params.toString()}`
       );
-      return data.data;
+      return data;
     },
   });
 }

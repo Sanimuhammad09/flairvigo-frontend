@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/axios';
 
-const categories = [
+const mockCategories = [
   {
     name: 'SCRUB TOPS',
     image: '/images/product-top.png',
@@ -37,6 +39,21 @@ const categories = [
 ];
 
 export function ShopByCategory() {
+  const { data: liveCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data } = await api.get('/categories');
+      return data.data || data;
+    },
+  });
+
+  const displayCategories = liveCategories && liveCategories.length > 0 ? liveCategories.map((c: any, idx: number) => ({
+    name: c.name.toUpperCase(),
+    image: c.image || (idx % 2 === 0 ? '/images/product-top.png' : '/images/product-pants.png'),
+    path: `/collections/${c.slug}`,
+    featured: idx < 2,
+  })) : mockCategories;
+
   return (
     <section className="py-16 sm:py-24 bg-white">
       <div className="container-premium px-4 sm:px-8">
@@ -50,7 +67,7 @@ export function ShopByCategory() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {categories.map((cat, idx) => (
+          {displayCategories.map((cat: any, idx: number) => (
             <Link
               key={cat.name}
               to={cat.path}

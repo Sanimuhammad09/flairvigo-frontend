@@ -23,11 +23,11 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const response = await api.post<AuthResponse>('/auth/login', data);
-      return response.data;
+      const response = await api.post('/auth/login', data);
+      return response.data.data || response.data;
     },
-    onSuccess: (response) => {
-      const { user, accessToken, refreshToken } = response;
+    onSuccess: (data) => {
+      const { user, accessToken, refreshToken } = data;
       setAuth(user, accessToken, refreshToken);
       toast.success(`Welcome back, ${user.firstName}!`);
       
@@ -57,11 +57,11 @@ export function useRegister() {
       firstName: string;
       lastName: string;
     }) => {
-      const response = await api.post<AuthResponse>('/auth/register', data);
-      return response.data;
+      const response = await api.post('/auth/register', data);
+      return response.data.data || response.data;
     },
-    onSuccess: (response) => {
-      const { user, accessToken, refreshToken } = response;
+    onSuccess: (data) => {
+      const { user, accessToken, refreshToken } = data;
       setAuth(user, accessToken, refreshToken);
       toast.success(`Welcome to Flairvigo, ${user.firstName}!`);
       navigate({ to: '/' });

@@ -21,51 +21,50 @@ function AccountLayout() {
   ];
 
   return (
-    <div className="min-h-[80vh] bg-neutral-50 pt-8 pb-20">
-      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white pt-12 pb-24">
+      <div className="container-premium max-w-7xl mx-auto px-4 sm:px-8">
         
-        <div className="mb-8">
-          <h1 className="heading-display text-3xl sm:text-4xl text-charcoal">
+        <div className="mb-12 border-b-2 border-[#282828] pb-6">
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.1em] text-[#282828]">
             My Account
           </h1>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-10">
+        <div className="flex flex-col md:flex-row gap-12 lg:gap-16">
           
           {/* Sidebar */}
-          <aside className="w-full md:w-64 shrink-0">
-            <div className="bg-white rounded-sm shadow-sm border border-neutral-100 overflow-hidden">
-              <nav className="flex flex-col">
-                {links.map(link => {
-                  const Icon = link.icon;
-                  const isActive = link.exact 
-                    ? location.pathname === link.path 
-                    : location.pathname.startsWith(link.path);
-                    
-                  return (
-                    <Link
-                      key={link.name}
-                      to={link.path}
-                      className={`flex items-center gap-3 px-6 py-4 text-sm font-medium transition-colors border-l-2 ${
-                        isActive 
-                          ? 'border-charcoal bg-neutral-50 text-charcoal' 
-                          : 'border-transparent text-neutral-500 hover:bg-neutral-50 hover:text-charcoal'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      {link.name}
-                    </Link>
-                  );
-                })}
-                <button
-                  onClick={logout}
-                  className="flex items-center gap-3 px-6 py-4 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors border-l-2 border-transparent text-left w-full"
-                >
-                  <LogOut size={18} />
-                  Sign Out
-                </button>
-              </nav>
-            </div>
+          <aside className="w-full md:w-[260px] shrink-0">
+            <nav className="flex flex-col gap-2">
+              {links.map(link => {
+                const Icon = link.icon;
+                const isActive = link.exact 
+                  ? location.pathname === link.path 
+                  : location.pathname.startsWith(link.path);
+                  
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    className={`flex items-center gap-4 px-5 py-4 text-[13px] tracking-[0.1em] uppercase transition-colors rounded-[2px] ${
+                      isActive 
+                        ? 'bg-[#282828] text-white font-black' 
+                        : 'font-bold text-[#525252] hover:bg-neutral-100 hover:text-[#282828]'
+                    }`}
+                  >
+                    <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+                    {link.name}
+                  </Link>
+                );
+              })}
+              <div className="h-px bg-neutral-200 my-2" />
+              <button
+                onClick={logout}
+                className="flex items-center gap-4 px-5 py-4 text-[13px] tracking-[0.1em] uppercase font-bold text-red-500 hover:bg-red-50 transition-colors rounded-[2px] text-left w-full"
+              >
+                <LogOut size={18} strokeWidth={2} />
+                Sign Out
+              </button>
+            </nav>
           </aside>
 
           {/* Main Content */}

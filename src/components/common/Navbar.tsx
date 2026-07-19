@@ -128,7 +128,7 @@ const topLevelNav = [
   { name: 'Women', hasMega: true },
   { name: 'Men', hasMega: true },
   { name: 'Group Orders', path: '/contact' },
-  { name: 'Students', path: '/contact' },
+  { name: 'Contact Us', path: '/contact' },
   { name: 'About', path: '/about' },
 ];
 

@@ -1,96 +1,68 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import useEmblaCarousel from 'embla-carousel-react';
 import { Heart, Minus, Plus, ChevronRight, Star, Truck, RotateCcw, Shield } from 'lucide-react';
 import { ProductCard } from '@/components/common/ProductCard';
-import { formatCurrency, colorMap } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { useCartStore } from '@/store/cart.store';
 import { useSEO } from '@/hooks/useSEO';
 import toast from 'react-hot-toast';
+
+import { useProduct, useRelatedProducts } from '@/features/products/api/hooks';
 
 export const Route = createFileRoute('/_shop/products/$slug')({
   component: ProductDetailPage,
 });
 
-const mockProduct = {
-  id: '1',
-  name: 'Leon™ Three-Pocket Scrub Top',
-  slug: 'leon-three-pocket-scrub-top',
-  description:
-    'Our bestselling scrub top. The Leon™ features a tailored fit with three functional pockets and is made from our proprietary FIONx™ fabric — antimicrobial, wrinkle-resistant, and ridiculously soft.',
-  fabricDetails:
-    '76% Polyester, 21% Rayon, 3% Spandex. FIONx™ antimicrobial technology. 4-way stretch. Wrinkle-resistant. Moisture-wicking.',
-  careInstructions:
-    'Machine wash cold, tumble dry low. Do not bleach. Do not iron directly on print.',
-  basePrice: 48,
-  category: { name: "Women's Scrubs", slug: 'women' },
-  images: [
-    { id: '1', url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1200&auto=format&fit=crop', alt: 'Front view', isMain: true },
-    { id: '2', url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop', alt: 'Side view' },
-    { id: '3', url: 'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?q=80&w=1200&auto=format&fit=crop', alt: 'Back view' },
-    { id: '4', url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop', alt: 'Detail view' },
-  ],
-  variants: [
-    { id: 'v1', color: 'Navy', colorHex: '#1B2A4A', size: 'XS', inventory: 15, priceOffset: 0 },
-    { id: 'v2', color: 'Navy', colorHex: '#1B2A4A', size: 'S', inventory: 22, priceOffset: 0 },
-    { id: 'v3', color: 'Navy', colorHex: '#1B2A4A', size: 'M', inventory: 30, priceOffset: 0 },
-    { id: 'v4', color: 'Navy', colorHex: '#1B2A4A', size: 'L', inventory: 18, priceOffset: 0 },
-    { id: 'v5', color: 'Navy', colorHex: '#1B2A4A', size: 'XL', inventory: 10, priceOffset: 0 },
-    { id: 'v6', color: 'Black', colorHex: '#111111', size: 'XS', inventory: 12, priceOffset: 0 },
-    { id: 'v7', color: 'Black', colorHex: '#111111', size: 'S', inventory: 20, priceOffset: 0 },
-    { id: 'v8', color: 'Black', colorHex: '#111111', size: 'M', inventory: 25, priceOffset: 0 },
-    { id: 'v9', color: 'Black', colorHex: '#111111', size: 'L', inventory: 14, priceOffset: 0 },
-    { id: 'v10', color: 'Burgundy', colorHex: '#722F37', size: 'S', inventory: 0, priceOffset: 0 },
-    { id: 'v11', color: 'Burgundy', colorHex: '#722F37', size: 'M', inventory: 8, priceOffset: 0 },
-  ],
-  reviews: [
-    { id: 'r1', rating: 5, title: 'Best scrubs ever!', content: 'So comfortable and they look amazing. The fit is perfect.', user: { firstName: 'Sarah', lastName: 'M.' } },
-    { id: 'r2', rating: 4, title: 'Love the fabric', content: 'Great quality fabric. Runs slightly small so size up.', user: { firstName: 'Dr. James', lastName: 'K.' } },
-  ],
-};
-
-const relatedProducts = [
-  { id: '2', slug: 'zamora-jogger-scrub-pants', name: 'Zamora™ Jogger Scrub Pants', price: 58, images: [{ url: 'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?q=80&w=800&auto=format&fit=crop' }, { url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop' }], colors: [{ name: 'Navy', hex: colorMap.navy }] },
-  { id: '3', slug: 'core-scrub-top-men', name: 'Core Scrub Top', price: 48, images: [{ url: 'https://images.unsplash.com/photo-1584982751601-97d883f51524?q=80&w=800&auto=format&fit=crop' }, { url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=800&auto=format&fit=crop' }], colors: [{ name: 'Black', hex: colorMap.black }] },
-  { id: '4', slug: 'seamless-underscrub', name: 'Seamless Underscrub', price: 38, images: [{ url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800&auto=format&fit=crop' }, { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop' }], colors: [{ name: 'White', hex: colorMap.white }] },
-  { id: '5', slug: 'premium-fleece-jacket', name: 'Premium Fleece Jacket', price: 98, images: [{ url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop' }, { url: 'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?q=80&w=800&auto=format&fit=crop' }], colors: [{ name: 'Navy', hex: colorMap.navy }] },
-];
-
 function ProductDetailPage() {
   const { slug } = Route.useParams();
-  const product = mockProduct;
+  const { data: product, isLoading } = useProduct(slug);
+  const { data: relatedProductsData } = useRelatedProducts(product?.id || '', 4);
 
   useSEO({
-    title: product.name,
-    description: product.description,
+    title: product?.name || 'Product',
+    description: product?.description || '',
   });
 
   const uniqueColors = Array.from(
-    new Map(product.variants.map((v) => [v.color, { name: v.color, hex: v.colorHex || '#ccc' }])).values()
+    new Map(product?.variants?.map((v) => [v.color, { name: v.color, hex: v.colorHex || '#ccc' }]) || []).values()
   );
 
-  const [selectedColor, setSelectedColor] = useState(uniqueColors[0]?.name || '');
+  const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [openAccordion, setOpenAccordion] = useState<string | null>('description');
+  const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
 
-  const availableSizes = product.variants
+  useEffect(() => {
+    if (uniqueColors.length > 0 && !selectedColor) {
+      setSelectedColor(uniqueColors[0].name);
+    }
+  }, [uniqueColors, selectedColor]);
+
+  // Handle sticky mobile "Add to Cart" appearance
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolledPastHero(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const availableSizes = (product?.variants || [])
     .filter((v) => v.color === selectedColor)
     .map((v) => ({ size: v.size, inStock: v.inventory > 0 }));
 
-  const selectedVariant = product.variants.find(
+  const selectedVariant = (product?.variants || []).find(
     (v) => v.color === selectedColor && v.size === selectedSize
   );
 
-  const price = product.basePrice + (selectedVariant?.priceOffset || 0);
+  const price = (product?.basePrice || 0) + (selectedVariant?.priceOffset || 0);
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
-    if (!selectedVariant) return;
+    if (!selectedVariant || !product) return;
     addItem({
       variantId: selectedVariant.id,
       productId: product.id,
@@ -99,30 +71,39 @@ function ProductDetailPage() {
       color: selectedVariant.color,
       size: selectedVariant.size,
       price: product.basePrice + selectedVariant.priceOffset,
-      image: product.images[0]?.url || '',
+      image: product.images?.[0]?.url || '',
       quantity,
     });
-    toast.success('Added to cart');
+    toast.success('Added to bag');
   };
 
-  const scrollTo = useCallback(
-    (index: number) => {
-      emblaApi?.scrollTo(index);
-      setActiveImageIndex(index);
-    },
-    [emblaApi]
-  );
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-8 w-32 bg-neutral-200 rounded mb-4"></div>
+          <div className="h-64 w-64 bg-neutral-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center text-neutral-500 font-bold tracking-widest uppercase">
+        Product not found
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="container-premium py-4">
-        <nav className="flex items-center gap-2 text-[12px] text-neutral-400">
-          <Link to="/" className="hover:text-black transition-colors">
-            Home
-          </Link>
+    <div className="min-h-screen bg-white pb-24 lg:pb-0 relative">
+      {/* Breadcrumbs - Sticky Top Desktop */}
+      <div className="hidden lg:block sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-neutral-100 py-3 px-8">
+        <nav className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-neutral-400">
+          <Link to="/" className="hover:text-black transition-colors">Home</Link>
           <ChevronRight size={10} />
-          <Link to={`/collections/${product.category.slug}`} className="hover:text-black transition-colors">
+          <Link to="/collections/$slug" params={{ slug: product.category.slug || 'all' }} className="hover:text-black transition-colors">
             {product.category.name}
           </Link>
           <ChevronRight size={10} />
@@ -130,78 +111,83 @@ function ProductDetailPage() {
         </nav>
       </div>
 
-      {/* Product Section */}
-      <section className="container-premium pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
-          {/* Image Gallery */}
-          <div>
-            <div className="overflow-hidden mb-3 bg-neutral-100 aspect-[3/4]" ref={emblaRef}>
-              <div className="flex h-full">
-                {product.images.map((image) => (
-                  <div key={image.id} className="flex-[0_0_100%] min-w-0 relative">
-                    <img
-                      src={image.url}
-                      alt={image.alt || product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Thumbnails */}
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {product.images.map((image, index) => (
-                <button
-                  key={image.id}
-                  onClick={() => scrollTo(index)}
-                  className={`w-[72px] h-[72px] shrink-0 overflow-hidden border transition-colors ${
-                    activeImageIndex === index ? 'border-black' : 'border-transparent hover:border-neutral-300'
-                  }`}
-                >
-                  <img src={image.url} alt={image.alt || ''} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+      <div className="flex flex-col lg:flex-row w-full max-w-[2000px] mx-auto">
+        
+        {/* Left Side: Image Gallery */}
+        <div className="w-full lg:w-[62%] xl:w-[68%] lg:border-r border-neutral-100 bg-[#f5f5f5]">
+          {/* Mobile Breadcrumb */}
+          <div className="lg:hidden py-4 px-4 bg-white">
+            <nav className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-neutral-400">
+              <Link to="/" className="hover:text-black transition-colors">Home</Link>
+              <ChevronRight size={10} />
+              <Link to="/collections/$slug" params={{ slug: product.category.slug || 'all' }} className="hover:text-black transition-colors">
+                {product.category.name}
+              </Link>
+            </nav>
           </div>
 
-          {/* Product Info */}
-          <div className="flex flex-col lg:pt-2">
-            {/* Badge */}
-            <span className="text-[9px] font-bold tracking-[0.12em] uppercase bg-black text-white px-2 py-1 w-fit mb-4">
-              Best Seller
-            </span>
-
-            <h1 className="font-heading font-bold text-2xl sm:text-3xl tracking-tight text-black mb-2">
-              {product.name}
-            </h1>
-
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} size={13} className="text-black fill-black" />
-                ))}
+          {/* Desktop Grid Gallery */}
+          <div className="hidden lg:grid grid-cols-2 gap-[2px] p-[2px]">
+            {product.images?.map((image) => (
+              <div key={image.id} className="relative aspect-[3/4] bg-neutral-100 overflow-hidden group">
+                <img
+                  src={image.url}
+                  alt={image.alt || product.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
-              <span className="text-[13px] text-neutral-500">
-                {product.reviews.length} reviews
-              </span>
+            ))}
+          </div>
+
+          {/* Mobile Horizontal Snap Gallery */}
+          <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory hide-scrollbar">
+            {product.images?.map((image) => (
+              <div key={image.id} className="w-full flex-shrink-0 snap-center aspect-[3/4] bg-neutral-100 relative">
+                <img
+                  src={image.url}
+                  alt={image.alt || product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Product Details (Sticky) */}
+        <div className="w-full lg:w-[38%] xl:w-[32%] bg-white">
+          <div className="lg:sticky lg:top-12 px-6 lg:px-10 py-8 lg:py-12 h-fit lg:max-h-[calc(100vh-48px)] overflow-y-auto custom-scrollbar">
+            
+            {/* Title & Price */}
+            <div className="mb-8">
+              <div className="flex justify-between items-start gap-4 mb-2">
+                <h1 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-black leading-none uppercase">
+                  {product.name}
+                </h1>
+                <p className="text-xl lg:text-2xl font-black text-black shrink-0">
+                  {formatCurrency(price)}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={12} className="text-black fill-black" />
+                  ))}
+                </div>
+                <span className="text-[11px] font-bold tracking-widest text-neutral-400 uppercase">
+                  ({product.reviews?.length || 0} Reviews)
+                </span>
+              </div>
             </div>
 
-            <p className="text-xl font-semibold text-black mb-5">
-              {formatCurrency(price)}
-            </p>
-
-            <p className="text-[14px] text-neutral-600 leading-relaxed mb-8">
-              {product.description}
-            </p>
-
-            {/* Color Selection */}
-            <div className="mb-6">
-              <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-neutral-500 mb-3">
-                Color — <span className="text-black">{selectedColor}</span>
-              </p>
-              <div className="flex gap-2">
+            {/* Colors */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[11px] font-black tracking-[0.15em] uppercase text-black">
+                  Color: <span className="text-neutral-500 font-bold ml-1">{selectedColor}</span>
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
                 {uniqueColors.map((color) => (
                   <button
                     key={color.name}
@@ -209,15 +195,15 @@ function ProductDetailPage() {
                       setSelectedColor(color.name);
                       setSelectedSize('');
                     }}
-                    className={`w-8 h-8 rounded-full p-[2px] transition-all ${
+                    className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                       selectedColor === color.name
-                        ? 'ring-2 ring-black ring-offset-2'
-                        : 'hover:ring-1 hover:ring-neutral-300 hover:ring-offset-1'
+                        ? 'border-2 border-black p-[2px]'
+                        : 'border border-transparent hover:border-neutral-300 p-0'
                     }`}
                     title={color.name}
                   >
                     <span
-                      className="block w-full h-full rounded-full border border-neutral-200"
+                      className="block w-full h-full rounded-full border border-black/10 shadow-sm"
                       style={{ backgroundColor: color.hex }}
                     />
                   </button>
@@ -225,28 +211,28 @@ function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Size Selection */}
-            <div className="mb-6">
+            {/* Sizes */}
+            <div className="mb-10">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-neutral-500">
-                  Size {selectedSize && `— ${selectedSize}`}
+                <p className="text-[11px] font-black tracking-[0.15em] uppercase text-black">
+                  Select Size
                 </p>
-                <Link to="/fit-finder" className="text-[12px] text-neutral-500 underline underline-offset-2 hover:text-black transition-colors">
+                <Link to="/fit-finder" className="text-[11px] font-bold tracking-widest text-neutral-500 hover:text-black transition-colors uppercase underline underline-offset-4">
                   Size Guide
                 </Link>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2">
                 {availableSizes.map(({ size, inStock }) => (
                   <button
                     key={size}
                     onClick={() => inStock && setSelectedSize(size)}
                     disabled={!inStock}
-                    className={`min-w-[48px] px-4 py-2.5 text-[13px] font-medium border transition-colors ${
+                    className={`relative py-3.5 text-[12px] font-black uppercase tracking-widest border transition-all ${
                       selectedSize === size
-                        ? 'bg-black text-white border-black'
+                        ? 'bg-black text-white border-black shadow-md'
                         : inStock
-                          ? 'border-neutral-200 text-black hover:border-black'
-                          : 'border-neutral-100 text-neutral-300 cursor-not-allowed line-through'
+                          ? 'border-neutral-200 text-charcoal hover:border-black bg-white'
+                          : 'border-neutral-100 text-neutral-300 cursor-not-allowed bg-neutral-50 line-through'
                     }`}
                   >
                     {size}
@@ -255,40 +241,13 @@ function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Quantity */}
-            {selectedVariant && selectedVariant.inventory > 0 && (
-              <div className="mb-6">
-                <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-neutral-500 mb-3">
-                  Quantity
-                </p>
-                <div className="flex items-center border border-neutral-200 w-fit">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-3 text-neutral-500 hover:text-black transition-colors"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <span className="px-5 py-3 text-[13px] font-medium text-black min-w-[48px] text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-3 text-neutral-500 hover:text-black transition-colors"
-                    disabled={quantity >= selectedVariant.inventory}
-                  >
-                    <Plus size={14} />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Add to Cart & Wishlist */}
-            <div className="flex gap-3 mb-8">
+            {/* Desktop Add to Cart Button */}
+            <div className="hidden lg:flex gap-3 mb-10">
               <button
-                className={`flex-1 text-[12px] font-bold tracking-[0.1em] uppercase py-4 transition-colors ${
+                className={`flex-1 text-[13px] font-black tracking-[0.15em] uppercase py-5 transition-all shadow-md hover:shadow-xl ${
                   !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
-                    ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                    : 'bg-black text-white hover:bg-neutral-800'
+                    ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
+                    : 'bg-black text-white hover:bg-neutral-800 hover:-translate-y-0.5'
                 }`}
                 disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
                 onClick={handleAddToCart}
@@ -296,69 +255,55 @@ function ProductDetailPage() {
                 {!selectedSize
                   ? 'Select a Size'
                   : selectedVariant?.inventory === 0
-                    ? 'Out of Stock'
+                    ? 'Waitlist Me'
                     : 'Add to Bag'}
               </button>
               <button
-                className="px-4 border border-neutral-200 text-black hover:border-black transition-colors"
+                className="w-16 flex items-center justify-center border-2 border-neutral-200 text-black hover:border-black transition-colors bg-white hover:bg-neutral-50"
                 aria-label="Add to wishlist"
               >
-                <Heart size={18} strokeWidth={1.5} />
+                <Heart size={20} strokeWidth={2.5} />
               </button>
             </div>
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 py-5 border-t border-neutral-100">
-              <div className="flex flex-col items-center text-center gap-1.5">
-                <Truck size={18} strokeWidth={1.5} />
-                <span className="text-[10px] font-semibold tracking-wider uppercase text-neutral-500">
-                  Free Shipping
-                </span>
+            {/* Features list */}
+            <div className="mb-10 space-y-4">
+              <div className="flex items-center gap-4 text-[11px] font-black tracking-widest uppercase text-charcoal">
+                <Shield size={16} className="text-emerald-600" />
+                Anti-Wrinkle & Odor Resistant
               </div>
-              <div className="flex flex-col items-center text-center gap-1.5">
-                <RotateCcw size={18} strokeWidth={1.5} />
-                <span className="text-[10px] font-semibold tracking-wider uppercase text-neutral-500">
-                  Easy Returns
-                </span>
+              <div className="flex items-center gap-4 text-[11px] font-black tracking-widest uppercase text-charcoal">
+                <Truck size={16} />
+                Free Shipping on Orders over $50
               </div>
-              <div className="flex flex-col items-center text-center gap-1.5">
-                <Shield size={18} strokeWidth={1.5} />
-                <span className="text-[10px] font-semibold tracking-wider uppercase text-neutral-500">
-                  Secure Checkout
-                </span>
+              <div className="flex items-center gap-4 text-[11px] font-black tracking-widest uppercase text-charcoal">
+                <RotateCcw size={16} />
+                30-Day Hassle-Free Returns
               </div>
             </div>
 
             {/* Accordions */}
-            <div className="border-t border-neutral-100 mt-2">
+            <div className="border-t-2 border-black/5 mt-8">
               {[
-                { key: 'description', title: 'Description', content: product.description },
+                { key: 'description', title: 'Why You\'ll Love It', content: product.description },
                 {
                   key: 'fabric',
                   title: 'Fabric & Care',
-                  content: `${product.fabricDetails}\n\n${product.careInstructions}`,
-                },
-                {
-                  key: 'shipping',
-                  title: 'Shipping & Returns',
-                  content:
-                    'Free standard shipping on orders over $50. Express shipping available. 30-day hassle-free returns on all unworn items with tags attached.',
+                  content: `${product.fabricDetails || 'Premium proprietary fabric blend.'}\n\n${product.careInstructions || 'Machine wash cold. Tumble dry low.'}`,
                 },
               ].map((section) => (
-                <div key={section.key} className="border-b border-neutral-100">
+                <div key={section.key} className="border-b border-black/5">
                   <button
                     onClick={() =>
                       setOpenAccordion(openAccordion === section.key ? null : section.key)
                     }
-                    className="flex items-center justify-between w-full py-4 text-[13px] font-semibold text-black"
+                    className="flex items-center justify-between w-full py-5 text-[12px] font-black tracking-widest uppercase text-black hover:text-neutral-500 transition-colors"
                   >
                     {section.title}
-                    <Plus
-                      size={14}
-                      className={`transition-transform duration-200 ${
-                        openAccordion === section.key ? 'rotate-45' : ''
-                      }`}
-                    />
+                    <div className="relative w-3 h-3">
+                      <span className="absolute top-1/2 left-0 w-full h-[2px] bg-current -translate-y-1/2 rounded-full" />
+                      <span className={`absolute top-0 left-1/2 w-[2px] h-full bg-current -translate-x-1/2 rounded-full transition-transform duration-300 ${openAccordion === section.key ? 'scale-y-0' : 'scale-y-100'}`} />
+                    </div>
                   </button>
                   <AnimatePresence>
                     {openAccordion === section.key && (
@@ -366,10 +311,10 @@ function ProductDetailPage() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
+                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
                         className="overflow-hidden"
                       >
-                        <p className="text-[13px] text-neutral-600 leading-relaxed pb-4 whitespace-pre-line">
+                        <p className="text-[14px] text-neutral-600 leading-relaxed pb-6 pt-2 font-medium">
                           {section.content}
                         </p>
                       </motion.div>
@@ -378,48 +323,76 @@ function ProductDetailPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Reviews Section */}
-      <section className="border-t border-neutral-100 py-16">
-        <div className="container-premium">
-          <h2 className="font-heading font-bold text-2xl tracking-tight text-black mb-8">
-            Reviews
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-            {product.reviews.map((review) => (
-              <div key={review.id} className="p-6 border border-neutral-100">
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={12}
-                      className={i < review.rating ? 'text-black fill-black' : 'text-neutral-200'}
-                    />
-                  ))}
-                </div>
-                <h4 className="font-semibold text-[14px] text-black mb-2">{review.title}</h4>
-                <p className="text-[13px] text-neutral-600 mb-3">{review.content}</p>
-                <p className="text-[12px] text-neutral-400">
-                  — {review.user.firstName} {review.user.lastName}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Mobile Sticky Add to Bag */}
+      <AnimatePresence>
+        {isScrolledPastHero && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe"
+          >
+            <button
+              className={`w-full text-[13px] font-black tracking-[0.15em] uppercase py-4 transition-all shadow-md ${
+                !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
+                  : 'bg-black text-white hover:bg-neutral-800'
+              }`}
+              disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
+              onClick={handleAddToCart}
+            >
+              {!selectedSize
+                ? 'Select a Size'
+                : selectedVariant?.inventory === 0
+                  ? 'Waitlist Me'
+                  : `Add to Bag • ${formatCurrency(price)}`}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Mobile inline button (when sticky is hidden) */}
+      <div className="lg:hidden px-6 pb-12 pt-4">
+          <button
+              className={`w-full text-[13px] font-black tracking-[0.15em] uppercase py-5 transition-all shadow-md ${
+                !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
+                  : 'bg-black text-white hover:bg-neutral-800'
+              }`}
+              disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
+              onClick={handleAddToCart}
+            >
+              {!selectedSize
+                ? 'Select a Size'
+                : selectedVariant?.inventory === 0
+                  ? 'Waitlist Me'
+                  : `Add to Bag`}
+            </button>
+      </div>
 
       {/* Related Products */}
-      <section className="border-t border-neutral-100 py-16 bg-neutral-50">
-        <div className="container-premium">
-          <h2 className="font-heading font-bold text-2xl tracking-tight text-black mb-8">
-            You May Also Like
+      <section className="border-t-4 border-black pt-16 pb-24 bg-[#fafafa]">
+        <div className="max-w-[2000px] mx-auto px-6 lg:px-12">
+          <h2 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-black mb-10 uppercase">
+            Complete The Set
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-            {relatedProducts.map((p) => (
-              <ProductCard key={p.id} {...p} />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+            {relatedProductsData?.map((p) => (
+              <ProductCard 
+                key={p.id} 
+                id={p.id}
+                slug={p.slug}
+                name={p.name}
+                price={p.basePrice}
+                images={p.images || []}
+                colors={p.variants?.map(v => ({ name: v.color, hex: v.colorHex || '#000000' })) || []}
+                isNew={p.isFeatured}
+              />
             ))}
           </div>
         </div>

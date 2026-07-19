@@ -13,7 +13,7 @@ const faqData = [
     questions: [
       {
         q: 'How long does shipping take?',
-        a: 'Standard shipping takes 5-7 business days. Express shipping (2-3 business days) is available at checkout. Free shipping is available on orders over $50.',
+        a: 'Standard shipping takes 5-7 business days. Express shipping (2-3 business days) is available at checkout. Free shipping is available on orders over ₦50,000.',
       },
       {
         q: 'Can I track my order?',
@@ -51,7 +51,7 @@ const faqData = [
       },
       {
         q: 'Can I personalize my scrubs?',
-        a: 'Yes! We offer custom embroidery on select items. You can add your name, title, or credentials during checkout for $15.',
+        a: 'Yes! We offer custom embroidery on select items. You can add your name, title, or credentials during checkout for ₦15,000.',
       },
     ],
   },

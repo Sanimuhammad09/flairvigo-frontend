@@ -45,7 +45,7 @@ function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" autoComplete="off">
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="text-xs font-semibold tracking-wider uppercase text-neutral-600">
             Email
@@ -54,6 +54,7 @@ function LoginPage() {
             id="email"
             type="email"
             placeholder="you@example.com"
+            autoComplete="off"
             {...register('email')}
             className={errors.email ? 'border-red-500' : ''}
           />
@@ -77,6 +78,7 @@ function LoginPage() {
           <div className="relative">
             <Input
               id="password"
+              autoComplete="new-password"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}

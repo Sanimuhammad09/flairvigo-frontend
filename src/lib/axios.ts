@@ -31,7 +31,10 @@ api.interceptors.response.use(
       
       try {
         // Try to refresh token
-        const refreshResponse = await axios.post(`${baseURL}/auth/refresh`, {}, {
+        const refreshToken = useAuthStore.getState().refreshToken;
+        const refreshResponse = await axios.post(`${baseURL}/auth/refresh`, {
+          refreshToken
+        }, {
           withCredentials: true // send refresh cookie
         });
         

@@ -54,31 +54,49 @@ export function Footer() {
       <div className="container-premium px-4 sm:px-8">
         <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-8 xl:gap-16 mb-20">
           
-          {/* Logo Section */}
-          <div className="lg:w-[30%]">
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl leading-tight tracking-[0.1em] uppercase mb-1">
+          {/* Logo & Newsletter Section */}
+          <div className="lg:w-[35%] flex flex-col gap-6">
+            <h2 className="font-heading font-bold text-3xl sm:text-4xl leading-tight tracking-[0.1em] uppercase">
               AWESOME
               <br />
               HUMANS
             </h2>
-            <p className="font-heading font-bold text-lg tracking-[0.15em] uppercase text-white/90 mb-8">
+            <p className="font-heading font-bold text-lg tracking-[0.15em] uppercase text-white/90 mb-2">
               #WEARFLAIRVIGO
             </p>
-            <div className="flex gap-4">
+            
+            {/* Newsletter */}
+            <div className="mt-4 mb-8">
+              <h4 className="text-[11px] font-bold tracking-[0.1em] uppercase mb-4 text-white">
+                SIGN UP FOR 15% OFF
+              </h4>
+              <form className="flex w-full max-w-sm" onSubmit={(e) => e.preventDefault()}>
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="bg-transparent border border-white/30 text-white px-4 py-3 text-[13px] w-full focus:outline-none focus:border-white transition-colors"
+                />
+                <button type="submit" className="bg-white text-black px-6 py-3 text-[12px] font-bold tracking-wider uppercase hover:bg-neutral-200 transition-colors">
+                  Join
+                </button>
+              </form>
+            </div>
+
+            <div className="flex gap-5">
               <a href="#" className="text-white/60 hover:text-white transition-colors">
-                <FaInstagram size={20} />
+                <FaInstagram size={22} />
               </a>
               <a href="#" className="text-white/60 hover:text-white transition-colors">
-                <FaTwitter size={20} />
+                <FaTwitter size={22} />
               </a>
               <a href="#" className="text-white/60 hover:text-white transition-colors">
-                <FaYoutube size={20} />
+                <FaYoutube size={22} />
               </a>
             </div>
           </div>
 
           {/* Links Grid */}
-          <div className="lg:w-[70%] grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="lg:w-[65%] grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* GET HELP Column */}
             <div className="flex flex-col gap-6">
               <div>

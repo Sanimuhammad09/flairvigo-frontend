@@ -3,85 +3,13 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/common/ProductCard';
 import { Link } from '@tanstack/react-router';
-import { colorMap } from '@/lib/utils';
+import { useFeaturedProducts } from '@/features/products/api/hooks';
 
-const mockProducts = [
-  {
-    id: '1',
-    slug: 'women-leon-scrub-top',
-    name: 'Leon™ Three-Pocket Scrub Top',
-    price: 48,
-    images: [
-      { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop' },
-      { url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800&auto=format&fit=crop' },
-    ],
-    colors: [
-      { name: 'Navy', hex: colorMap.navy },
-      { name: 'Black', hex: colorMap.black },
-      { name: 'Burgundy', hex: colorMap.burgundy },
-    ],
-    isNew: true,
-  },
-  {
-    id: '2',
-    slug: 'women-zamora-jogger',
-    name: 'Zamora™ Jogger Scrub Pants',
-    price: 58,
-    images: [
-      { url: 'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?q=80&w=800&auto=format&fit=crop' },
-      { url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop' },
-    ],
-    colors: [
-      { name: 'Navy', hex: colorMap.navy },
-      { name: 'Charcoal', hex: colorMap.charcoal },
-      { name: 'Olive', hex: colorMap.olive },
-    ],
-    isBestseller: true,
-  },
-  {
-    id: '3',
-    slug: 'men-leon-scrub-top',
-    name: "Men's Core Scrub Top",
-    price: 48,
-    images: [
-      { url: 'https://images.unsplash.com/photo-1584982751601-97d883f51524?q=80&w=800&auto=format&fit=crop' },
-      { url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=800&auto=format&fit=crop' },
-    ],
-    colors: [
-      { name: 'Black', hex: colorMap.black },
-      { name: 'Navy', hex: colorMap.navy },
-    ],
-    isNew: true,
-  },
-  {
-    id: '4',
-    slug: 'women-underscrub',
-    name: 'Seamless Underscrub',
-    price: 38,
-    images: [
-      { url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800&auto=format&fit=crop' },
-      { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop' },
-    ],
-    colors: [
-      { name: 'White', hex: colorMap.white },
-      { name: 'Black', hex: colorMap.black },
-    ],
-  },
-  {
-    id: '5',
-    slug: 'women-fleece-jacket',
-    name: 'Premium Fleece Jacket',
-    price: 98,
-    originalPrice: 118,
-    images: [
-      { url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop' },
-      { url: 'https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?q=80&w=800&auto=format&fit=crop' },
-    ],
-    colors: [{ name: 'Navy', hex: colorMap.navy }],
-  },
-];
+
 
 export function NewArrivals() {
+  const { data: featuredProducts, isLoading } = useFeaturedProducts(8);
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     slidesToScroll: 1,
@@ -156,14 +84,30 @@ export function NewArrivals() {
         <div className="relative -mx-4 sm:mx-0">
           <div className="overflow-hidden px-4 sm:px-0" ref={emblaRef}>
             <div className="flex gap-4 md:gap-5">
-              {mockProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex-[0_0_75%] sm:flex-[0_0_45%] md:flex-[0_0_30%] lg:flex-[0_0_23%] min-w-0"
-                >
-                  <ProductCard {...product} />
-                </div>
-              ))}
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex-[0_0_75%] sm:flex-[0_0_45%] md:flex-[0_0_30%] lg:flex-[0_0_23%] min-w-0">
+                    <ProductCard isLoading={true} id="" slug="" name="" price={0} images={[]} colors={[]} />
+                  </div>
+                ))
+              ) : (
+                featuredProducts?.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex-[0_0_75%] sm:flex-[0_0_45%] md:flex-[0_0_30%] lg:flex-[0_0_23%] min-w-0"
+                  >
+                    <ProductCard 
+                      id={product.id}
+                      slug={product.slug}
+                      name={product.name}
+                      price={product.basePrice}
+                      images={product.images || []}
+                      colors={product.variants?.map(v => ({ name: v.color, hex: v.colorHex || '#000000' })) || []}
+                      isNew={product.isFeatured}
+                    />
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

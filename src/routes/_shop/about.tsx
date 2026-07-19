@@ -45,8 +45,8 @@ function AboutPage() {
                 comfortable, and ready for anything your shift throws at you.
               </p>
             </div>
-            <div className="bg-neutral-100 aspect-[4/5] rounded-sm flex items-center justify-center">
-              <span className="text-neutral-400 text-sm">Mission Image</span>
+            <div className="bg-neutral-100 aspect-[4/5] rounded-sm flex items-center justify-center overflow-hidden">
+              <img src="/images/hero.png" alt="Mission" className="w-full h-full object-cover" />
             </div>
           </div>
         </section>

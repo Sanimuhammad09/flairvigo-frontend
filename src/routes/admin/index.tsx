@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, ShoppingCart, Users, Package, ArrowUpRight, ArrowDownRight, TrendingUp, CreditCard } from 'lucide-react';
+import { Banknote, ShoppingCart, Users, Package, ArrowUpRight, ArrowDownRight, TrendingUp, CreditCard } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '@/lib/axios';
@@ -14,7 +14,7 @@ function AdminDashboard() {
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const { data } = await api.get('/dashboard/stats');
-      return data;
+      return data.data || data;
     },
   });
 
@@ -22,7 +22,7 @@ function AdminDashboard() {
     queryKey: ['dashboard-revenue'],
     queryFn: async () => {
       const { data } = await api.get('/dashboard/revenue');
-      return data;
+      return data.data || data;
     },
   });
 
@@ -30,15 +30,15 @@ function AdminDashboard() {
     queryKey: ['dashboard-recent-orders'],
     queryFn: async () => {
       const { data } = await api.get('/dashboard/recent-orders');
-      return data;
+      return data.data || data;
     },
   });
 
   const statsCards = stats ? [
-    { title: 'Total Revenue', value: formatCurrency(stats.totalRevenue), change: `${stats.revenueChange}%`, trend: parseFloat(stats.revenueChange) >= 0 ? 'up' : 'down', icon: DollarSign, color: 'emerald' },
-    { title: 'Orders', value: stats.ordersCount.toString(), change: `${stats.ordersChange}%`, trend: parseFloat(stats.ordersChange) >= 0 ? 'up' : 'down', icon: ShoppingCart, color: 'blue' },
-    { title: 'Active Customers', value: stats.customersCount.toString(), change: '+12%', trend: 'up', icon: Users, color: 'indigo' },
-    { title: 'Products in Stock', value: stats.productsInStock.toString(), change: '-2%', trend: 'down', icon: Package, color: 'orange' },
+    { title: 'Total Revenue', value: formatCurrency(stats.totalRevenue || 0), change: `${stats.revenueChange || 0}%`, trend: parseFloat(stats.revenueChange || '0') >= 0 ? 'up' : 'down', icon: Banknote, color: 'emerald' },
+    { title: 'Orders', value: (stats.ordersCount || 0).toString(), change: `${stats.ordersChange || 0}%`, trend: parseFloat(stats.ordersChange || '0') >= 0 ? 'up' : 'down', icon: ShoppingCart, color: 'blue' },
+    { title: 'Active Customers', value: (stats.customersCount || 0).toString(), change: '+12%', trend: 'up', icon: Users, color: 'indigo' },
+    { title: 'Products in Stock', value: (stats.productsInStock || 0).toString(), change: '-2%', trend: 'down', icon: Package, color: 'orange' },
   ] : [];
 
   const getColorClasses = (color: string, isUp: boolean) => {
@@ -56,8 +56,8 @@ function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-charcoal tracking-tight">Dashboard Overview</h1>
-          <p className="text-neutral-500 text-sm mt-1">Here's what's happening with your store today.</p>
+          <h1 className="text-3xl font-black text-charcoal tracking-tight uppercase">Dashboard Overview</h1>
+          <p className="text-neutral-500 text-sm mt-1 font-medium tracking-wide">Here's what's happening with your store today.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="px-4 py-2 bg-white rounded-lg border border-neutral-200 shadow-sm flex items-center gap-2">
@@ -87,19 +87,19 @@ function AdminDashboard() {
             const colors = getColorClasses(stat.color, isUp);
             
             return (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100 hover:shadow-md transition-shadow">
+              <div key={index} className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-neutral-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[13px] font-bold text-neutral-500 uppercase tracking-wider">{stat.title}</h3>
+                  <h3 className="text-[12px] font-bold text-neutral-500 uppercase tracking-widest">{stat.title}</h3>
                   <div className={`p-2.5 rounded-lg ${colors.bg}`}>
                     <Icon size={20} className={colors.text} />
                   </div>
                 </div>
                 <div className="flex items-end justify-between">
                   <div>
-                    <h4 className="text-3xl font-black text-charcoal tracking-tight">{stat.value}</h4>
-                    <p className={`text-[13px] font-medium mt-2 flex items-center gap-1 ${colors.trendBg}`}>
-                      {isUp ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                      {stat.change} <span className="text-neutral-400 font-normal ml-1">vs last month</span>
+                    <h4 className="text-4xl font-black text-charcoal tracking-tighter">{stat.value}</h4>
+                    <p className={`text-[12px] font-bold mt-3 flex items-center gap-1 ${colors.trendBg} px-2 py-1 bg-neutral-50 rounded-md w-fit`}>
+                      {isUp ? <ArrowUpRight size={16} strokeWidth={2.5} /> : <ArrowDownRight size={16} strokeWidth={2.5} />}
+                      {stat.change} <span className="text-neutral-400 font-medium ml-1">vs last month</span>
                     </p>
                   </div>
                 </div>
@@ -112,11 +112,11 @@ function AdminDashboard() {
       {/* Charts & Lists Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-neutral-100 h-[420px] flex flex-col">
+        <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-neutral-100 h-[420px] flex flex-col">
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-charcoal">Revenue Overview</h3>
-              <p className="text-sm text-neutral-500">Sales performance over the last 7 months</p>
+              <h3 className="text-xl font-bold text-charcoal uppercase tracking-wide">Revenue Overview</h3>
+              <p className="text-[13px] font-medium text-neutral-500 mt-1">Sales performance over the last 7 months</p>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50/50 rounded-lg border border-blue-100">
               <TrendingUp className="w-4 h-4 text-blue-600" />
@@ -154,11 +154,11 @@ function AdminDashboard() {
         </div>
 
         {/* Recent Orders */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100 h-[420px] flex flex-col">
+        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] border border-neutral-100 h-[420px] flex flex-col">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-charcoal">Recent Sales</h3>
-              <p className="text-sm text-neutral-500">Latest transactions</p>
+              <h3 className="text-xl font-bold text-charcoal uppercase tracking-wide">Recent Sales</h3>
+              <p className="text-[13px] font-medium text-neutral-500 mt-1">Latest transactions</p>
             </div>
           </div>
           
@@ -178,14 +178,14 @@ function AdminDashboard() {
               ))
             ) : recentOrders && recentOrders.length > 0 ? (
               recentOrders.map((order: any, i: number) => (
-                <div key={i} className="flex items-center justify-between p-3 hover:bg-neutral-50 rounded-lg transition-colors group cursor-pointer border border-transparent hover:border-neutral-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-charcoal font-bold text-sm group-hover:bg-charcoal group-hover:text-white transition-colors">
+                <div key={i} className="flex items-center justify-between p-3 hover:bg-neutral-50 rounded-xl transition-all duration-200 group cursor-pointer border border-transparent hover:border-neutral-100 hover:shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-charcoal font-black text-sm group-hover:bg-charcoal group-hover:text-white transition-colors shadow-inner">
                       {order.customer.charAt(0)}
                     </div>
                     <div>
-                      <p className="text-[13px] font-bold text-charcoal">{order.customer}</p>
-                      <p className="text-[11px] text-neutral-500">{order.email}</p>
+                      <p className="text-[14px] font-bold text-charcoal tracking-wide">{order.customer}</p>
+                      <p className="text-[12px] font-medium text-neutral-500">{order.email}</p>
                     </div>
                   </div>
                   <div className="text-right">

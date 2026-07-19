@@ -51,8 +51,8 @@ function AccountSettingsPage() {
 
   const onUpdateProfile = async (data: any) => {
     try {
-      // Assuming a PUT /users/profile endpoint
-      const response = await api.put('/users/profile', data);
+      // Assuming a PUT /users/me endpoint
+      const response = await api.put('/users/me', data);
       setAuth(user ? { ...user, ...data } : null, useAuthStore.getState().token || '');
       toast.success('Profile updated successfully');
     } catch (error: any) {

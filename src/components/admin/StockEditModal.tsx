@@ -49,83 +49,80 @@ export function StockEditModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div className="p-6 border-b border-neutral-200 flex items-center justify-between">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 sm:p-6">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-neutral-100 flex flex-col overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-md border-b border-neutral-100 p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-charcoal">Update Stock</h2>
-            <p className="text-sm text-neutral-500 mt-1">{productName}</p>
+            <h2 className="text-xl font-black text-charcoal tracking-tight uppercase">Update Stock</h2>
+            <p className="text-sm font-medium text-neutral-500 mt-1">{productName}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
-          >
-            <X size={20} />
+          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-charcoal hover:bg-neutral-100 rounded-full transition-colors">
+            <X size={20} strokeWidth={2.5} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
-              Current Stock: <span className="font-semibold">{currentStock}</span>
-            </label>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
-              New Stock Level
-            </label>
-            <Input
-              type="number"
-              min="0"
-              {...register('inventory', { valueAsNumber: true })}
-              className="text-lg"
-              placeholder="Enter new stock quantity"
-            />
-            {errors.inventory && (
-              <p className="text-red-500 text-sm mt-1">{errors.inventory.message}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+          <div className="p-6 sm:p-8 space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide">Current Stock</span>
+                <span className="text-sm font-black text-charcoal bg-neutral-100 px-3 py-1 rounded-md">{currentStock}</span>
+              </div>
+              <label className="block text-xs font-bold text-charcoal mb-2 uppercase tracking-wide">
+                New Stock Level
+              </label>
+              <Input
+                type="number"
+                min="0"
+                {...register('inventory', { valueAsNumber: true })}
+                className="h-14 text-lg font-bold bg-neutral-50 border-neutral-200 rounded-xl focus-visible:ring-1 focus-visible:ring-charcoal text-center"
+                placeholder="Enter new quantity"
+              />
+              {errors.inventory && (
+                <p className="text-red-500 text-xs font-semibold mt-1.5 text-center">{errors.inventory.message}</p>
+              )}
+            </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              <strong>Quick Actions:</strong>
-            </p>
-            <div className="flex gap-2 mt-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => reset({ inventory: currentStock + 10 })}
-                className="text-xs"
-              >
-                +10
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => reset({ inventory: currentStock + 50 })}
-                className="text-xs"
-              >
-                +50
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => reset({ inventory: currentStock + 100 })}
-                className="text-xs"
-              >
-                +100
-              </Button>
+            <div className="bg-neutral-50/50 border border-neutral-100 rounded-xl p-4">
+              <p className="text-xs font-bold text-neutral-400 uppercase tracking-wide mb-3">
+                Quick Add
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => reset({ inventory: currentStock + 10 })}
+                  className="h-10 font-bold border-neutral-200 hover:border-charcoal hover:bg-neutral-50 transition-colors"
+                >
+                  +10
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => reset({ inventory: currentStock + 50 })}
+                  className="h-10 font-bold border-neutral-200 hover:border-charcoal hover:bg-neutral-50 transition-colors"
+                >
+                  +50
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => reset({ inventory: currentStock + 100 })}
+                  className="h-10 font-bold border-neutral-200 hover:border-charcoal hover:bg-neutral-50 transition-colors"
+                >
+                  +100
+                </Button>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="bg-neutral-50/50 border-t border-neutral-100 p-6 flex items-center justify-end gap-3 rounded-b-2xl">
+            <Button type="button" variant="outline" onClick={onClose} className="h-11 px-6 font-bold rounded-xl text-neutral-600 hover:text-black border-neutral-200 shadow-sm hover:bg-neutral-50 transition-colors">
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="flex items-center gap-2">
+            <Button type="submit" disabled={isLoading} className="h-11 px-8 font-black uppercase tracking-widest bg-black text-white hover:bg-neutral-800 rounded-xl shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md flex items-center gap-2">
               <Save size={16} />
-              {isLoading ? 'Updating...' : 'Update Stock'}
+              {isLoading ? 'Updating...' : 'Update'}
             </Button>
           </div>
         </form>

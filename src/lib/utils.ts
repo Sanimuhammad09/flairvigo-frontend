@@ -13,13 +13,13 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatCurrency(
   amount: number,
-  currency = 'USD',
-  locale = 'en-US'
+  currency = 'NGN',
+  locale = 'en-NG'
 ): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
   }).format(amount);
 }
 

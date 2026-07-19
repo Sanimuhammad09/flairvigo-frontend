@@ -3,7 +3,11 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronRight, Heart } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
-const products = [
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/axios';
+import { formatCurrency } from '@/lib/utils';
+
+const mockProducts = [
   {
     id: '1',
     slug: 'isabel-wide-leg-scrub-pant-celery',
@@ -49,6 +53,22 @@ const products = [
 ];
 
 export function PicksForYou() {
+  const { data: liveProducts, isLoading } = useQuery({
+    queryKey: ['featured-products'],
+    queryFn: async () => {
+      const { data } = await api.get('/products');
+      return data.data || data;
+    },
+  });
+
+  const displayProducts = liveProducts && liveProducts.length > 0 ? liveProducts.map((p: any) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    price: p.basePrice,
+    image: p.images?.[0]?.url || '/images/product-top.png',
+  })) : mockProducts;
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     slidesToScroll: 1,
@@ -82,12 +102,12 @@ export function PicksForYou() {
       <div className="relative">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex gap-4 sm:gap-6">
-            {products.map((product, index) => (
+            {displayProducts.map((product: any, index: number) => (
               <div
                 key={product.id}
                 className={`flex-[0_0_75%] sm:flex-[0_0_40%] md:flex-[0_0_30%] lg:flex-[0_0_24%] xl:flex-[0_0_20%] min-w-0 group ${
                   index === 0 ? 'ml-4 sm:ml-8 lg:ml-16' : ''
-                } ${index === products.length - 1 ? 'mr-4 sm:mr-8 lg:mr-16' : ''}`}
+                } ${index === displayProducts.length - 1 ? 'mr-4 sm:mr-8 lg:mr-16' : ''}`}
               >
                 <Link to={`/products/${product.slug}`} className="block relative">
                   {/* Image */}
@@ -118,7 +138,7 @@ export function PicksForYou() {
                     {product.name}
                   </p>
                   <p className="text-[13px] sm:text-[14px] text-neutral-600">
-                    ${product.price.toFixed(2)}
+                    {formatCurrency(product.price)}
                   </p>
                 </Link>
               </div>

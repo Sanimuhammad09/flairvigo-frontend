@@ -50,7 +50,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-ivory text-charcoal pt-16 pb-8 font-sans border-t border-neutral-200">
+    <footer className="bg-ivory text-charcoal pt-16 sm:pt-24 pb-8 font-sans border-t border-neutral-200 mt-16 sm:mt-24 lg:mt-32">
       <div className="container-premium px-4 sm:px-8">
         <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-8 xl:gap-16 mb-20">
           

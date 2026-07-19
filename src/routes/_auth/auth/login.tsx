@@ -36,8 +36,8 @@ function LoginPage() {
       transition={{ duration: 0.5 }}
       className="w-full"
     >
-      <div className="mb-10">
-        <h1 className="heading-display text-3xl sm:text-4xl text-charcoal mb-3">
+      <div className="mb-10 text-center">
+        <h1 className="font-heading font-black text-3xl sm:text-4xl text-charcoal mb-3 uppercase tracking-wider">
           Welcome Back
         </h1>
         <p className="text-neutral-500 text-sm">
@@ -47,54 +47,54 @@ function LoginPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" autoComplete="off">
         <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-xs font-semibold tracking-wider uppercase text-neutral-600">
-            Email
+          <label htmlFor="email" className="text-[11px] font-bold tracking-[0.1em] uppercase text-neutral-500">
+            Email Address
           </label>
           <Input
             id="email"
             type="email"
             placeholder="you@example.com"
-            autoComplete="off"
+            autoComplete="email"
             {...register('email')}
-            className={errors.email ? 'border-red-500' : ''}
+            className={`h-14 bg-neutral-50 border-transparent hover:border-neutral-200 focus:bg-white focus:border-charcoal transition-all ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
           />
           {errors.email && (
-            <span className="text-xs text-red-500">{errors.email.message}</span>
+            <span className="text-xs text-red-500 mt-1">{errors.email.message}</span>
           )}
         </div>
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-xs font-semibold tracking-wider uppercase text-neutral-600">
+            <label htmlFor="password" className="text-[11px] font-bold tracking-[0.1em] uppercase text-neutral-500">
               Password
             </label>
             <Link
               to="/auth/forgot-password"
-              className="text-xs text-neutral-500 hover:text-charcoal transition-colors"
+              className="text-[11px] font-bold tracking-[0.1em] uppercase text-neutral-400 hover:text-charcoal transition-colors underline underline-offset-4"
             >
-              Forgot password?
+              Forgot?
             </Link>
           </div>
           <div className="relative">
             <Input
               id="password"
-              autoComplete="new-password"
+              autoComplete="current-password"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+              className={`h-14 bg-neutral-50 border-transparent hover:border-neutral-200 focus:bg-white focus:border-charcoal transition-all pr-12 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-charcoal"
+              className="absolute right-0 top-0 h-14 w-14 flex items-center justify-center text-neutral-400 hover:text-charcoal transition-colors"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={20} strokeWidth={1.5} /> : <Eye size={20} strokeWidth={1.5} />}
             </button>
           </div>
           {errors.password && (
-            <span className="text-xs text-red-500">{errors.password.message}</span>
+            <span className="text-xs text-red-500 mt-1">{errors.password.message}</span>
           )}
         </div>
 

@@ -26,11 +26,15 @@ export function AuthLayout() {
       {/* Right side - Auth Forms */}
       <div className="w-full lg:w-1/2 flex flex-col relative overflow-hidden">
         {/* Header */}
-        <header className="w-full p-6 sm:p-10 flex items-center justify-between">
-          <Link to="/" className="text-charcoal hover:text-gold transition-colors flex items-center gap-2 text-sm font-semibold tracking-wider uppercase">
-            <ArrowLeft size={16} /> Back to Shop
+        <header className="w-full px-4 sm:px-10 py-6 sm:py-8 flex items-center justify-center relative">
+          <Link 
+            to="/" 
+            className="absolute left-4 sm:left-10 text-neutral-400 hover:text-charcoal transition-colors p-2 -ml-2 rounded-full hover:bg-neutral-100 flex items-center justify-center"
+            aria-label="Back to Shop"
+          >
+            <ArrowLeft size={22} strokeWidth={1.5} />
           </Link>
-          <Link to="/" className="font-heading font-black text-xl tracking-[0.2em] uppercase text-charcoal">
+          <Link to="/" className="font-heading font-black text-2xl tracking-[0.2em] uppercase text-charcoal">
             Flairvigo
           </Link>
         </header>

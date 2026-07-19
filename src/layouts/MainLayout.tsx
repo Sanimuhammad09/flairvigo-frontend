@@ -10,7 +10,7 @@ export function MainLayout() {
       <AnnouncementBar />
       <Navbar />
 
-      <main className="flex-1 flex flex-col relative w-full">
+      <main className="flex-1 flex flex-col relative w-full pb-16 sm:pb-24 lg:pb-32">
         <Outlet />
       </main>
 

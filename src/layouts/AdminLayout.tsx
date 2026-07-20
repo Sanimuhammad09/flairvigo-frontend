@@ -83,10 +83,10 @@ export function AdminLayout() {
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#1e1e24]/95 backdrop-blur-xl text-white w-64 shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.05)] border-r border-white/10">
+    <div className="flex flex-col h-full bg-charcoal text-white w-64 shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.05)] border-r border-white/10">
       <div className="p-6 border-b border-white/5 flex items-center justify-between">
-        <Link to="/" className="font-heading font-black text-xl tracking-[0.2em] uppercase text-white hover:text-white/80 transition-colors">
-          Flairvigo
+        <Link to="/" className="flex items-center">
+          <img src="/images/logo.png" alt="Flairvigo" className="h-10 w-auto object-contain rounded-sm" />
         </Link>
         <span className="text-[10px] text-white font-bold tracking-widest uppercase bg-white/20 px-2.5 py-1 rounded-sm shadow-sm backdrop-blur-md">Admin</span>
       </div>

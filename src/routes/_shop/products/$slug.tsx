@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ChevronRight, Star, Check, ChevronDown, HelpCircle } from 'lucide-react';
+import { Heart, ChevronRight, Star, Check, ChevronDown } from 'lucide-react';
 import { ProductCard } from '@/components/common/ProductCard';
 import { formatCurrency } from '@/lib/utils';
 import { useCartStore } from '@/store/cart.store';
@@ -37,7 +37,7 @@ function ProductDetailPage() {
   const [mainImageIndex, setMainImageIndex] = useState(0);
   
   // Cross-sell state
-  const [crossSellSize, setCrossSellSize] = useState('Select a Size');
+  const [crossSellSize, setCrossSellSize] = useState('');
   const [crossSellLength, setCrossSellLength] = useState('Regular');
 
   useEffect(() => {
@@ -83,9 +83,31 @@ function ProductDetailPage() {
     toast.success('Added to bag');
   };
 
+  const crossSellProduct = relatedProductsData?.[0];
+  const crossSellVariant = crossSellProduct?.variants?.find(v => v.size === crossSellSize) || crossSellProduct?.variants?.[0];
+  
+  const handleAddCrossSell = () => {
+    if (!crossSellProduct || !crossSellVariant) {
+        toast.error('Please select a size for the complete set item');
+        return;
+    }
+    addItem({
+      variantId: crossSellVariant.id,
+      productId: crossSellProduct.id,
+      name: crossSellProduct.name,
+      slug: crossSellProduct.slug,
+      color: crossSellVariant.color,
+      size: crossSellVariant.size,
+      price: crossSellProduct.basePrice + crossSellVariant.priceOffset,
+      image: crossSellProduct.images?.[0]?.url || '',
+      quantity: 1,
+    });
+    toast.success('Added complete set to bag');
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-ivory flex items-center justify-center">
+      <div className="min-h-screen bg-[#ffffff] flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-8 w-32 bg-neutral-200 rounded mb-4"></div>
           <div className="h-64 w-64 bg-neutral-200 rounded"></div>
@@ -96,7 +118,7 @@ function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-ivory flex items-center justify-center text-neutral-500 font-bold tracking-widest uppercase">
+      <div className="min-h-screen bg-[#ffffff] flex items-center justify-center text-neutral-500 font-bold tracking-widest uppercase">
         Product not found
       </div>
     );
@@ -130,9 +152,9 @@ function ProductDetailPage() {
   const mainImage = product.images?.[mainImageIndex]?.url || product.images?.[0]?.url || '';
 
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-0 relative text-charcoal">
+    <div className="min-h-screen bg-[#ffffff] pb-24 lg:pb-0 relative text-charcoal">
       {/* Breadcrumbs - Sticky Top Desktop */}
-      <div className="hidden lg:block sticky top-0 z-40 bg-white border-b border-neutral-100 py-4 px-10">
+      <div className="hidden lg:block sticky top-0 z-40 bg-[#ffffff] border-b border-neutral-100 py-4 px-10">
         <nav className="flex items-center gap-2 text-[12px] font-bold text-charcoal">
           <Link to="/" className="hover:text-black transition-colors">Women's</Link>
           <span className="text-neutral-400">•</span>
@@ -144,13 +166,13 @@ function ProductDetailPage() {
         </nav>
       </div>
 
-      <div className="flex flex-col lg:flex-row w-full max-w-[2000px] mx-auto">
+      <div className="flex flex-col lg:flex-row w-full max-w-[2000px] mx-auto bg-[#ffffff]">
         
         {/* Left Side: Image Gallery */}
         <div className="w-full lg:w-[65%] xl:w-[70%] flex flex-col lg:flex-row bg-[#f9f9f9]">
           
           {/* Mobile Breadcrumb */}
-          <div className="lg:hidden py-4 px-4 bg-white">
+          <div className="lg:hidden py-4 px-4 bg-[#ffffff]">
             <nav className="flex items-center gap-2 text-[11px] font-bold text-neutral-500">
               <Link to="/" className="hover:text-black transition-colors">Women's</Link>
               <span className="text-neutral-300">•</span>
@@ -161,7 +183,7 @@ function ProductDetailPage() {
           </div>
 
           {/* Desktop Thumbnail Strip */}
-          <div className="hidden lg:flex flex-col gap-3 p-4 w-[110px] shrink-0 sticky top-[60px] h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar bg-white z-10">
+          <div className="hidden lg:flex flex-col gap-3 p-4 w-[110px] shrink-0 sticky top-[60px] h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar bg-[#ffffff] z-10 border-r border-neutral-100">
             {product.images?.map((image, idx) => (
               <button 
                 key={image.id} 
@@ -185,13 +207,13 @@ function ProductDetailPage() {
              <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between lg:hidden pointer-events-none">
                 <button 
                   onClick={() => setMainImageIndex(prev => prev > 0 ? prev - 1 : (product.images?.length || 1) - 1)}
-                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md pointer-events-auto text-charcoal"
+                  className="w-10 h-10 bg-[#ffffff] rounded-full flex items-center justify-center shadow-md pointer-events-auto text-charcoal"
                 >
                   <ChevronRight size={20} className="rotate-180" />
                 </button>
                 <button 
                   onClick={() => setMainImageIndex(prev => prev < (product.images?.length || 1) - 1 ? prev + 1 : 0)}
-                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md pointer-events-auto text-charcoal"
+                  className="w-10 h-10 bg-[#ffffff] rounded-full flex items-center justify-center shadow-md pointer-events-auto text-charcoal"
                 >
                   <ChevronRight size={20} />
                 </button>
@@ -199,7 +221,7 @@ function ProductDetailPage() {
              
              {/* Play Button Overlay (Mock) */}
              {mainImageIndex === 0 && (
-               <div className="absolute top-6 right-6 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-charcoal cursor-pointer">
+               <div className="absolute top-6 right-6 w-10 h-10 bg-[#ffffff] rounded-full flex items-center justify-center shadow-md text-charcoal cursor-pointer">
                  <div className="w-3 h-3 bg-charcoal ml-1 clip-play" style={{ clipPath: 'polygon(0 0, 0% 100%, 100% 50%)' }}></div>
                </div>
              )}
@@ -207,7 +229,7 @@ function ProductDetailPage() {
         </div>
 
         {/* Right Side: Product Details (Sticky) */}
-        <div className="w-full lg:w-[35%] xl:w-[30%] bg-white border-l border-neutral-100 relative">
+        <div className="w-full lg:w-[35%] xl:w-[30%] bg-[#ffffff] border-l border-neutral-100 relative">
           <div className="lg:sticky lg:top-[60px] px-6 lg:px-12 py-8 lg:py-10 h-fit lg:max-h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar">
             
             {/* Header: Title & Heart */}
@@ -250,8 +272,8 @@ function ProductDetailPage() {
               
               {/* Filter Pills */}
               <div className="flex gap-2 mb-4">
-                 <button className="px-4 py-1.5 bg-neutral-100 text-charcoal text-[11px] font-bold rounded-full">All Colors</button>
-                 <button className="px-4 py-1.5 text-neutral-500 hover:bg-neutral-50 text-[11px] font-bold rounded-full transition-colors">My Colors</button>
+                 <button className="px-4 py-1.5 bg-neutral-100 text-charcoal text-[11px] font-bold rounded-full border border-neutral-200">All Colors</button>
+                 <button className="px-4 py-1.5 text-neutral-500 hover:bg-neutral-50 text-[11px] font-bold rounded-full transition-colors border border-transparent">My Colors</button>
               </div>
 
               {/* Core Colors */}
@@ -270,7 +292,7 @@ function ProductDetailPage() {
                       >
                         <span className="block w-full h-full rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />
                         {selectedColor === color.name && (
-                          <Check size={14} strokeWidth={3} className={`absolute z-10 ${color.hex === '#000000' || color.hex === '#340A0A' ? 'text-white' : 'text-white drop-shadow-md'}`} />
+                          <Check size={14} strokeWidth={3} className={`absolute z-10 ${color.hex === '#000000' || color.hex === '#340A0A' ? 'text-[#ffffff]' : 'text-[#ffffff] drop-shadow-md'}`} />
                         )}
                       </button>
                     ))}
@@ -294,7 +316,7 @@ function ProductDetailPage() {
                       >
                         <span className="block w-full h-full rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />
                         {selectedColor === color.name && (
-                          <Check size={14} strokeWidth={3} className={`absolute z-10 ${color.hex === '#FFFFFF' || color.hex === '#FFF9E3' ? 'text-charcoal' : 'text-white drop-shadow-md'}`} />
+                          <Check size={14} strokeWidth={3} className={`absolute z-10 ${color.hex === '#FFFFFF' || color.hex === '#FFF9E3' ? 'text-charcoal' : 'text-[#ffffff] drop-shadow-md'}`} />
                         )}
                       </button>
                     ))}
@@ -314,16 +336,16 @@ function ProductDetailPage() {
               <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-5 gap-2 mb-3">
                 {displaySizes.map(({ size, inStock }) => (
                   <button
-                    key={size}
-                    onClick={() => inStock && setSelectedSize(size)}
-                    disabled={!inStock}
-                    className={`relative py-3 text-[11px] font-bold uppercase transition-all rounded-[2px] ${
-                      selectedSize === size
-                        ? 'border-2 border-charcoal text-charcoal shadow-[inset_0_0_0_1px_rgba(0,0,0,1)]'
-                        : inStock
-                          ? 'border border-neutral-200 text-charcoal hover:border-charcoal bg-white'
-                          : 'border border-neutral-100 text-neutral-300 cursor-not-allowed bg-neutral-50 overflow-hidden'
-                    }`}
+                     key={size}
+                     onClick={() => inStock && setSelectedSize(size)}
+                     disabled={!inStock}
+                     className={`relative py-3 text-[11px] font-bold uppercase transition-all rounded-[2px] ${
+                       selectedSize === size
+                         ? 'bg-charcoal text-[#ffffff]'
+                         : inStock
+                           ? 'border border-neutral-300 text-charcoal hover:border-charcoal bg-[#ffffff]'
+                           : 'border border-neutral-200 text-neutral-400 cursor-not-allowed bg-neutral-50 overflow-hidden'
+                     }`}
                   >
                     {size}
                     {!inStock && <div className="absolute inset-0 w-full h-[1px] bg-neutral-300 rotate-[25deg] top-1/2 left-0 origin-center" />}
@@ -343,8 +365,8 @@ function ProductDetailPage() {
                      onClick={() => setSelectedLength(len)}
                      className={`py-3 text-[12px] font-bold transition-all rounded-[2px] ${
                        selectedLength === len
-                         ? 'border-2 border-charcoal text-charcoal shadow-[inset_0_0_0_1px_rgba(0,0,0,1)]'
-                         : 'border border-neutral-200 text-charcoal hover:border-charcoal bg-white'
+                         ? 'border-2 border-charcoal text-charcoal shadow-[inset_0_0_0_1px_rgba(0,0,0,1)] bg-[#ffffff]'
+                         : 'border border-neutral-300 text-charcoal hover:border-charcoal bg-[#ffffff]'
                      }`}
                    >
                      {len}
@@ -358,8 +380,8 @@ function ProductDetailPage() {
               <button
                 className={`w-full text-[12px] font-bold tracking-widest uppercase py-4 rounded-[2px] transition-all flex items-center justify-center gap-2 ${
                   !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
-                    ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
-                    : 'bg-charcoal text-white hover:bg-black'
+                    ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
+                    : 'bg-charcoal text-[#ffffff] hover:bg-black'
                 }`}
                 disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
                 onClick={handleAddToCart}
@@ -393,18 +415,20 @@ function ProductDetailPage() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2 mb-3">
-                   <div className="relative border border-neutral-300 rounded-[2px]">
+                   <div className="relative border border-neutral-300 rounded-[2px] bg-[#ffffff]">
                      <select 
                        className="w-full appearance-none bg-transparent py-3 pl-4 pr-10 text-[12px] font-bold text-charcoal outline-none cursor-pointer"
                        value={crossSellSize}
                        onChange={(e) => setCrossSellSize(e.target.value)}
                      >
-                       <option disabled>Select a Size</option>
-                       <option>XS</option><option>S</option><option>M</option><option>L</option>
+                       <option value="" disabled>Select a Size</option>
+                       {relatedProductsData[0].variants?.map(v => (
+                         <option key={v.id} value={v.size}>{v.size}</option>
+                       ))}
                      </select>
                      <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-charcoal" />
                    </div>
-                   <div className="relative border border-neutral-300 rounded-[2px]">
+                   <div className="relative border border-neutral-300 rounded-[2px] bg-[#ffffff]">
                      <select 
                        className="w-full appearance-none bg-transparent py-3 pl-4 pr-10 text-[12px] font-bold text-charcoal outline-none cursor-pointer"
                        value={crossSellLength}
@@ -416,7 +440,10 @@ function ProductDetailPage() {
                    </div>
                 </div>
 
-                <button className="w-full py-3 border border-charcoal text-charcoal font-bold text-[11px] tracking-widest uppercase hover:bg-neutral-50 transition-colors">
+                <button 
+                  onClick={handleAddCrossSell}
+                  className="w-full py-3 border border-charcoal text-charcoal font-bold text-[11px] tracking-widest uppercase hover:bg-neutral-50 transition-colors bg-[#ffffff]"
+                >
                   {formatCurrency(relatedProductsData[0].basePrice)} • ADD TO BAG
                 </button>
               </div>
@@ -429,7 +456,7 @@ function ProductDetailPage() {
                    key={tab}
                    onClick={() => setActiveTab(tab)}
                    className={`flex-1 py-2 text-[11px] font-bold tracking-widest uppercase rounded-full transition-all ${
-                     activeTab === tab ? 'bg-white shadow-sm text-charcoal' : 'text-neutral-500 hover:text-charcoal'
+                     activeTab === tab ? 'bg-[#ffffff] shadow-[0_1px_3px_rgba(0,0,0,0.1)] text-charcoal' : 'text-neutral-500 hover:text-charcoal'
                    }`}
                  >
                    {tab}
@@ -443,10 +470,11 @@ function ProductDetailPage() {
                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                    <p>Go wide with on-the-pulse appeal. The {product.name} features a roomy silhouette with {featuresList.length} pockets and a super comfy waistband.</p>
                    <p>Select colors also available in a <span className="underline underline-offset-4 decoration-neutral-300">mid rise</span> with a ruched waistband.</p>
-                   <ul className="space-y-2 mt-4 ml-4">
+                   <ul className="space-y-2 mt-4">
                      {featuresList.map((feature, i) => (
-                       <li key={i} className="relative before:content-['•'] before:absolute before:-left-4 before:text-neutral-400">
-                         {feature}
+                       <li key={i} className="flex gap-2">
+                         <span className="text-neutral-400">•</span>
+                         <span>{feature}</span>
                        </li>
                      ))}
                    </ul>
@@ -464,14 +492,6 @@ function ProductDetailPage() {
                )}
             </div>
 
-            {/* Help Button */}
-            <div className="fixed bottom-6 right-6 lg:absolute lg:bottom-10 lg:right-10 z-50">
-               <button className="flex items-center gap-2 bg-charcoal text-white px-5 py-2.5 rounded-full shadow-lg hover:bg-black transition-colors">
-                 <HelpCircle size={16} />
-                 <span className="text-[13px] font-bold">Help</span>
-               </button>
-            </div>
-
           </div>
         </div>
       </div>
@@ -483,13 +503,13 @@ function ProductDetailPage() {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe"
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#ffffff] border-t border-neutral-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe"
           >
             <button
               className={`w-full text-[13px] font-bold tracking-widest uppercase py-4 transition-all shadow-md ${
                 !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
-                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
-                  : 'bg-charcoal text-white hover:bg-black'
+                  ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none'
+                  : 'bg-charcoal text-[#ffffff] hover:bg-black'
               }`}
               disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
               onClick={handleAddToCart}
@@ -505,7 +525,7 @@ function ProductDetailPage() {
       </AnimatePresence>
 
       {/* Wear It With Section */}
-      <section className="border-t border-neutral-200 pt-16 pb-24 bg-white mt-10">
+      <section className="border-t border-neutral-200 pt-16 pb-24 bg-[#ffffff] mt-10">
         <div className="max-w-[2000px] mx-auto px-6 lg:px-12">
           <h2 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-charcoal mb-10">
             Wear It With

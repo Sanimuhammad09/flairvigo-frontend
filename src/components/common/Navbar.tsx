@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { ShoppingBag, Search, User, Menu, X, Heart, ChevronDown, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/store/cart.store';
+import { SearchOverlay } from './SearchOverlay';
 
 /* ─── Mega Menu Data ─── */
 interface MegaMenuColumn {
@@ -158,6 +159,7 @@ const mobileMenuSections = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeMega, setActiveMega] = useState<string | null>(null);
   const [expandedMobileSection, setExpandedMobileSection] = useState<string | null>(null);
   const megaTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -246,6 +248,7 @@ export function Navbar() {
           <div className="flex items-center gap-3 md:gap-5">
             {/* Search Pill */}
             <button
+              onClick={() => setIsSearchOpen(true)}
               className="hidden lg:flex items-center gap-2 border border-black/20 rounded-full px-4 py-1.5 text-black/70 hover:border-black hover:text-black transition-colors"
               aria-label="Search"
             >
@@ -490,6 +493,8 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

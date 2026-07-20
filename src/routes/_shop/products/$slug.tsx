@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Minus, Plus, ChevronRight, Star, Truck, RotateCcw, Shield } from 'lucide-react';
+import { Heart, ChevronRight, Star, Check, ChevronDown, HelpCircle } from 'lucide-react';
 import { ProductCard } from '@/components/common/ProductCard';
 import { formatCurrency } from '@/lib/utils';
 import { useCartStore } from '@/store/cart.store';
@@ -30,9 +30,15 @@ function ProductDetailPage() {
 
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
+  const [selectedLength, setSelectedLength] = useState('Regular');
   const [quantity, setQuantity] = useState(1);
-  const [openAccordion, setOpenAccordion] = useState<string | null>('description');
+  const [activeTab, setActiveTab] = useState<'details' | 'fit' | 'fabric'>('details');
   const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
+  
+  // Cross-sell state
+  const [crossSellSize, setCrossSellSize] = useState('Select a Size');
+  const [crossSellLength, setCrossSellLength] = useState('Regular');
 
   useEffect(() => {
     if (uniqueColors.length > 0 && !selectedColor) {
@@ -79,7 +85,7 @@ function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-ivory flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-8 w-32 bg-neutral-200 rounded mb-4"></div>
           <div className="h-64 w-64 bg-neutral-200 rounded"></div>
@@ -90,164 +96,270 @@ function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center text-neutral-500 font-bold tracking-widest uppercase">
+      <div className="min-h-screen bg-ivory flex items-center justify-center text-neutral-500 font-bold tracking-widest uppercase">
         Product not found
       </div>
     );
   }
 
+  // Split colors for mock groups
+  const coreColors = uniqueColors.slice(0, Math.ceil(uniqueColors.length / 2) || 1);
+  const limitedColors = uniqueColors.slice(Math.ceil(uniqueColors.length / 2) || 1);
+
+  // Features list
+  const featuresList = [
+    "Two front slash pockets",
+    "One interior security pocket",
+    "One patch pocket",
+    "One pocket within patch pocket",
+    "One interior pen pocket",
+    "Two back pockets",
+    "Wide leg fit",
+    "Yoga waistband with adjustable drawcord",
+    "Clean hem",
+    "Petite, Regular, and Tall pants differ only in length",
+    "Engineered with Technical Comfort™"
+  ];
+
+  const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+  const sortedSizes = [...availableSizes].sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size));
+
+  // Default to these standard sizes if variant list is empty for styling purposes
+  const displaySizes = sortedSizes.length > 0 ? sortedSizes : sizeOrder.map(s => ({ size: s, inStock: true }));
+
+  const mainImage = product.images?.[mainImageIndex]?.url || product.images?.[0]?.url || '';
+
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-0 relative">
+    <div className="min-h-screen bg-white pb-24 lg:pb-0 relative text-charcoal">
       {/* Breadcrumbs - Sticky Top Desktop */}
-      <div className="hidden lg:block sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-neutral-100 py-3 px-8">
-        <nav className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-neutral-400">
-          <Link to="/" className="hover:text-black transition-colors">Home</Link>
-          <ChevronRight size={10} />
+      <div className="hidden lg:block sticky top-0 z-40 bg-white border-b border-neutral-100 py-4 px-10">
+        <nav className="flex items-center gap-2 text-[12px] font-bold text-charcoal">
+          <Link to="/" className="hover:text-black transition-colors">Women's</Link>
+          <span className="text-neutral-400">•</span>
           <Link to="/collections/$slug" params={{ slug: product.category.slug || 'all' }} className="hover:text-black transition-colors">
             {product.category.name}
           </Link>
-          <ChevronRight size={10} />
-          <span className="text-black">{product.name}</span>
+          <span className="text-neutral-400">•</span>
+          <span className="text-neutral-500">{product.name}</span>
         </nav>
       </div>
 
       <div className="flex flex-col lg:flex-row w-full max-w-[2000px] mx-auto">
         
         {/* Left Side: Image Gallery */}
-        <div className="w-full lg:w-[62%] xl:w-[68%] lg:border-r border-neutral-100 bg-[#f5f5f5]">
+        <div className="w-full lg:w-[65%] xl:w-[70%] flex flex-col lg:flex-row bg-[#f9f9f9]">
+          
           {/* Mobile Breadcrumb */}
           <div className="lg:hidden py-4 px-4 bg-white">
-            <nav className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-neutral-400">
-              <Link to="/" className="hover:text-black transition-colors">Home</Link>
-              <ChevronRight size={10} />
+            <nav className="flex items-center gap-2 text-[11px] font-bold text-neutral-500">
+              <Link to="/" className="hover:text-black transition-colors">Women's</Link>
+              <span className="text-neutral-300">•</span>
               <Link to="/collections/$slug" params={{ slug: product.category.slug || 'all' }} className="hover:text-black transition-colors">
                 {product.category.name}
               </Link>
             </nav>
           </div>
 
-          {/* Desktop Grid Gallery */}
-          <div className="hidden lg:grid grid-cols-2 gap-[2px] p-[2px]">
-            {product.images?.map((image) => (
-              <div key={image.id} className="relative aspect-[3/4] bg-neutral-100 overflow-hidden group">
-                <img
-                  src={image.url}
-                  alt={image.alt || product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile Horizontal Snap Gallery */}
-          <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory hide-scrollbar">
-            {product.images?.map((image) => (
-              <div key={image.id} className="w-full flex-shrink-0 snap-center aspect-[3/4] bg-neutral-100 relative">
+          {/* Desktop Thumbnail Strip */}
+          <div className="hidden lg:flex flex-col gap-3 p-4 w-[110px] shrink-0 sticky top-[60px] h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar bg-white z-10">
+            {product.images?.map((image, idx) => (
+              <button 
+                key={image.id} 
+                onClick={() => setMainImageIndex(idx)}
+                className={`relative aspect-[3/4] bg-neutral-100 overflow-hidden group border-2 transition-all ${mainImageIndex === idx ? 'border-charcoal' : 'border-transparent hover:border-neutral-200'}`}
+              >
                 <img
                   src={image.url}
                   alt={image.alt || product.name}
                   className="w-full h-full object-cover"
                 />
-              </div>
+              </button>
             ))}
+          </div>
+
+          {/* Main Image View */}
+          <div className="w-full relative bg-[#f9f9f9] min-h-[50vh] lg:min-h-screen flex items-center justify-center">
+             <img src={mainImage} alt={product.name} className="w-full h-auto max-h-screen object-contain" />
+             
+             {/* Carousel Arrows (Mobile) */}
+             <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between lg:hidden pointer-events-none">
+                <button 
+                  onClick={() => setMainImageIndex(prev => prev > 0 ? prev - 1 : (product.images?.length || 1) - 1)}
+                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md pointer-events-auto text-charcoal"
+                >
+                  <ChevronRight size={20} className="rotate-180" />
+                </button>
+                <button 
+                  onClick={() => setMainImageIndex(prev => prev < (product.images?.length || 1) - 1 ? prev + 1 : 0)}
+                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md pointer-events-auto text-charcoal"
+                >
+                  <ChevronRight size={20} />
+                </button>
+             </div>
+             
+             {/* Play Button Overlay (Mock) */}
+             {mainImageIndex === 0 && (
+               <div className="absolute top-6 right-6 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-charcoal cursor-pointer">
+                 <div className="w-3 h-3 bg-charcoal ml-1 clip-play" style={{ clipPath: 'polygon(0 0, 0% 100%, 100% 50%)' }}></div>
+               </div>
+             )}
           </div>
         </div>
 
         {/* Right Side: Product Details (Sticky) */}
-        <div className="w-full lg:w-[38%] xl:w-[32%] bg-white">
-          <div className="lg:sticky lg:top-12 px-6 lg:px-10 py-8 lg:py-12 h-fit lg:max-h-[calc(100vh-48px)] overflow-y-auto custom-scrollbar">
+        <div className="w-full lg:w-[35%] xl:w-[30%] bg-white border-l border-neutral-100 relative">
+          <div className="lg:sticky lg:top-[60px] px-6 lg:px-12 py-8 lg:py-10 h-fit lg:max-h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar">
             
-            {/* Title & Price */}
-            <div className="mb-8">
-              <div className="flex justify-between items-start gap-4 mb-2">
-                <h1 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-black leading-none uppercase">
-                  {product.name}
-                </h1>
-                <p className="text-xl lg:text-2xl font-black text-black shrink-0">
-                  {formatCurrency(price)}
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={12} className="text-black fill-black" />
-                  ))}
-                </div>
-                <span className="text-[11px] font-bold tracking-widest text-neutral-400 uppercase">
-                  ({product.reviews?.length || 0} Reviews)
-                </span>
-              </div>
+            {/* Header: Title & Heart */}
+            <div className="flex justify-between items-start gap-4 mb-2">
+              <h1 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-charcoal leading-tight">
+                {product.name}
+              </h1>
+              <button className="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-neutral-200 rounded-full text-charcoal hover:bg-neutral-50 transition-colors">
+                <Heart size={18} />
+              </button>
             </div>
-
-            {/* Colors */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[11px] font-black tracking-[0.15em] uppercase text-black">
-                  Color: <span className="text-neutral-500 font-bold ml-1">{selectedColor}</span>
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {uniqueColors.map((color) => (
-                  <button
-                    key={color.name}
-                    onClick={() => {
-                      setSelectedColor(color.name);
-                      setSelectedSize('');
-                    }}
-                    className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                      selectedColor === color.name
-                        ? 'border-2 border-black p-[2px]'
-                        : 'border border-transparent hover:border-neutral-300 p-0'
-                    }`}
-                    title={color.name}
-                  >
-                    <span
-                      className="block w-full h-full rounded-full border border-black/10 shadow-sm"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  </button>
+            
+            {/* Rating */}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star key={star} size={14} className="text-charcoal fill-charcoal" />
                 ))}
               </div>
+              <span className="text-[12px] font-bold text-neutral-500 underline underline-offset-4">
+                ({product.reviews?.length || '3,686'} Reviews)
+              </span>
             </div>
 
-            {/* Sizes */}
-            <div className="mb-10">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[11px] font-black tracking-[0.15em] uppercase text-black">
-                  Select Size
+            {/* Price */}
+            <p className="text-lg font-black text-charcoal mb-8">
+              {formatCurrency(price)}
+            </p>
+
+            {/* Color Selection */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[13px] font-bold text-charcoal">
+                  Color: <span className="text-neutral-500 font-normal">{selectedColor}</span>
                 </p>
-                <Link to="/fit-finder" className="text-[11px] font-bold tracking-widest text-neutral-500 hover:text-black transition-colors uppercase underline underline-offset-4">
-                  Size Guide
-                </Link>
+                <button className="text-[12px] font-bold text-charcoal underline underline-offset-4 decoration-neutral-300 hover:decoration-charcoal">
+                  Color Gallery
+                </button>
               </div>
-              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2">
-                {availableSizes.map(({ size, inStock }) => (
+              
+              {/* Filter Pills */}
+              <div className="flex gap-2 mb-4">
+                 <button className="px-4 py-1.5 bg-neutral-100 text-charcoal text-[11px] font-bold rounded-full">All Colors</button>
+                 <button className="px-4 py-1.5 text-neutral-500 hover:bg-neutral-50 text-[11px] font-bold rounded-full transition-colors">My Colors</button>
+              </div>
+
+              {/* Core Colors */}
+              {coreColors.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-[11px] font-bold text-charcoal mb-3">Core</p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {coreColors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => { setSelectedColor(color.name); setSelectedSize(''); }}
+                        className={`relative w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all ${
+                          selectedColor === color.name ? 'ring-2 ring-charcoal ring-offset-2' : 'hover:ring-1 hover:ring-neutral-300 hover:ring-offset-1'
+                        }`}
+                        title={color.name}
+                      >
+                        <span className="block w-full h-full rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />
+                        {selectedColor === color.name && (
+                          <Check size={14} strokeWidth={3} className={`absolute z-10 ${color.hex === '#000000' || color.hex === '#340A0A' ? 'text-white' : 'text-white drop-shadow-md'}`} />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Limited Edition Colors */}
+              {limitedColors.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-bold text-charcoal mb-3">Limited Edition</p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {limitedColors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => { setSelectedColor(color.name); setSelectedSize(''); }}
+                        className={`relative w-[30px] h-[30px] rounded-full flex items-center justify-center transition-all ${
+                          selectedColor === color.name ? 'ring-2 ring-charcoal ring-offset-2' : 'hover:ring-1 hover:ring-neutral-300 hover:ring-offset-1'
+                        }`}
+                        title={color.name}
+                      >
+                        <span className="block w-full h-full rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />
+                        {selectedColor === color.name && (
+                          <Check size={14} strokeWidth={3} className={`absolute z-10 ${color.hex === '#FFFFFF' || color.hex === '#FFF9E3' ? 'text-charcoal' : 'text-white drop-shadow-md'}`} />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Size Selection */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[13px] font-bold text-charcoal">Select a Size</p>
+                <button className="text-[12px] font-bold text-charcoal underline underline-offset-4 decoration-neutral-300 hover:decoration-charcoal">
+                  Size Chart
+                </button>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-5 gap-2 mb-3">
+                {displaySizes.map(({ size, inStock }) => (
                   <button
                     key={size}
                     onClick={() => inStock && setSelectedSize(size)}
                     disabled={!inStock}
-                    className={`relative py-3.5 text-[12px] font-black uppercase tracking-widest border transition-all ${
+                    className={`relative py-3 text-[11px] font-bold uppercase transition-all rounded-[2px] ${
                       selectedSize === size
-                        ? 'bg-black text-white border-black shadow-md'
+                        ? 'border-2 border-charcoal text-charcoal shadow-[inset_0_0_0_1px_rgba(0,0,0,1)]'
                         : inStock
-                          ? 'border-neutral-200 text-charcoal hover:border-black bg-white'
-                          : 'border-neutral-100 text-neutral-300 cursor-not-allowed bg-neutral-50 line-through'
+                          ? 'border border-neutral-200 text-charcoal hover:border-charcoal bg-white'
+                          : 'border border-neutral-100 text-neutral-300 cursor-not-allowed bg-neutral-50 overflow-hidden'
                     }`}
                   >
                     {size}
+                    {!inStock && <div className="absolute inset-0 w-full h-[1px] bg-neutral-300 rotate-[25deg] top-1/2 left-0 origin-center" />}
                   </button>
                 ))}
               </div>
+              <p className="text-[12px] text-neutral-500">Relaxed fit. We recommend choosing your normal size.</p>
             </div>
 
-            {/* Desktop Add to Cart Button */}
-            <div className="hidden lg:flex gap-3 mb-10">
+            {/* Length Selection */}
+            <div className="mb-10">
+              <p className="text-[13px] font-bold text-charcoal mb-3">Length: <span className="font-normal text-neutral-500">{selectedLength}</span></p>
+              <div className="grid grid-cols-3 gap-2">
+                 {['Regular', 'Petite', 'Tall'].map(len => (
+                   <button
+                     key={len}
+                     onClick={() => setSelectedLength(len)}
+                     className={`py-3 text-[12px] font-bold transition-all rounded-[2px] ${
+                       selectedLength === len
+                         ? 'border-2 border-charcoal text-charcoal shadow-[inset_0_0_0_1px_rgba(0,0,0,1)]'
+                         : 'border border-neutral-200 text-charcoal hover:border-charcoal bg-white'
+                     }`}
+                   >
+                     {len}
+                   </button>
+                 ))}
+              </div>
+            </div>
+
+            {/* Add to Bag Button */}
+            <div className="mb-10">
               <button
-                className={`flex-1 text-[13px] font-black tracking-[0.15em] uppercase py-5 transition-all shadow-md hover:shadow-xl ${
+                className={`w-full text-[12px] font-bold tracking-widest uppercase py-4 rounded-[2px] transition-all flex items-center justify-center gap-2 ${
                   !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
-                    ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
-                    : 'bg-black text-white hover:bg-neutral-800 hover:-translate-y-0.5'
+                    ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
+                    : 'bg-charcoal text-white hover:bg-black'
                 }`}
                 disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
                 onClick={handleAddToCart}
@@ -256,72 +368,108 @@ function ProductDetailPage() {
                   ? 'Select a Size'
                   : selectedVariant?.inventory === 0
                     ? 'Waitlist Me'
-                    : 'Add to Bag'}
-              </button>
-              <button
-                className="w-16 flex items-center justify-center border-2 border-neutral-200 text-black hover:border-black transition-colors bg-white hover:bg-neutral-50"
-                aria-label="Add to wishlist"
-              >
-                <Heart size={20} strokeWidth={2.5} />
+                    : `${formatCurrency(price)} • ADD TO BAG`}
               </button>
             </div>
 
-            {/* Features list */}
-            <div className="mb-10 space-y-4">
-              <div className="flex items-center gap-4 text-[11px] font-black tracking-widest uppercase text-charcoal">
-                <Shield size={16} className="text-emerald-600" />
-                Anti-Wrinkle & Odor Resistant
-              </div>
-              <div className="flex items-center gap-4 text-[11px] font-black tracking-widest uppercase text-charcoal">
-                <Truck size={16} />
-                Free Shipping on Orders over $50
-              </div>
-              <div className="flex items-center gap-4 text-[11px] font-black tracking-widest uppercase text-charcoal">
-                <RotateCcw size={16} />
-                30-Day Hassle-Free Returns
-              </div>
+            {/* Free Shipping Notice */}
+            <div className="text-center mb-10 pb-10 border-b border-neutral-200">
+               <p className="text-[12px] font-bold text-charcoal">Free Shipping for $50+ orders and <span className="underline underline-offset-2">Free Returns</span></p>
+               <button className="text-[11px] text-neutral-500 underline underline-offset-2 mt-1">Learn More</button>
             </div>
 
-            {/* Accordions */}
-            <div className="border-t-2 border-black/5 mt-8">
-              {[
-                { key: 'description', title: 'Why You\'ll Love It', content: product.description },
-                {
-                  key: 'fabric',
-                  title: 'Fabric & Care',
-                  content: `${product.fabricDetails || 'Premium proprietary fabric blend.'}\n\n${product.careInstructions || 'Machine wash cold. Tumble dry low.'}`,
-                },
-              ].map((section) => (
-                <div key={section.key} className="border-b border-black/5">
-                  <button
-                    onClick={() =>
-                      setOpenAccordion(openAccordion === section.key ? null : section.key)
-                    }
-                    className="flex items-center justify-between w-full py-5 text-[12px] font-black tracking-widest uppercase text-black hover:text-neutral-500 transition-colors"
-                  >
-                    {section.title}
-                    <div className="relative w-3 h-3">
-                      <span className="absolute top-1/2 left-0 w-full h-[2px] bg-current -translate-y-1/2 rounded-full" />
-                      <span className={`absolute top-0 left-1/2 w-[2px] h-full bg-current -translate-x-1/2 rounded-full transition-transform duration-300 ${openAccordion === section.key ? 'scale-y-0' : 'scale-y-100'}`} />
-                    </div>
-                  </button>
-                  <AnimatePresence>
-                    {openAccordion === section.key && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden"
-                      >
-                        <p className="text-[14px] text-neutral-600 leading-relaxed pb-6 pt-2 font-medium">
-                          {section.content}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+            {/* Complete The Set (Inline Widget) */}
+            {relatedProductsData && relatedProductsData.length > 0 && (
+              <div className="mb-10">
+                <h3 className="text-[14px] font-bold text-charcoal mb-4">Complete The Set</h3>
+                <div className="flex gap-4 mb-4">
+                  <div className="w-[80px] h-[100px] bg-neutral-100 shrink-0 relative">
+                     <img src={relatedProductsData[0].images?.[0]?.url} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 flex flex-col justify-center">
+                     <p className="font-bold text-[13px] text-charcoal">{relatedProductsData[0].name}</p>
+                     <p className="text-[12px] text-neutral-500 mt-1">{relatedProductsData[0].variants?.[0]?.color || 'Deep Purple'}</p>
+                  </div>
                 </div>
-              ))}
+                
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                   <div className="relative border border-neutral-300 rounded-[2px]">
+                     <select 
+                       className="w-full appearance-none bg-transparent py-3 pl-4 pr-10 text-[12px] font-bold text-charcoal outline-none cursor-pointer"
+                       value={crossSellSize}
+                       onChange={(e) => setCrossSellSize(e.target.value)}
+                     >
+                       <option disabled>Select a Size</option>
+                       <option>XS</option><option>S</option><option>M</option><option>L</option>
+                     </select>
+                     <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-charcoal" />
+                   </div>
+                   <div className="relative border border-neutral-300 rounded-[2px]">
+                     <select 
+                       className="w-full appearance-none bg-transparent py-3 pl-4 pr-10 text-[12px] font-bold text-charcoal outline-none cursor-pointer"
+                       value={crossSellLength}
+                       onChange={(e) => setCrossSellLength(e.target.value)}
+                     >
+                       <option>Regular</option><option>Petite</option><option>Tall</option>
+                     </select>
+                     <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-charcoal" />
+                   </div>
+                </div>
+
+                <button className="w-full py-3 border border-charcoal text-charcoal font-bold text-[11px] tracking-widest uppercase hover:bg-neutral-50 transition-colors">
+                  {formatCurrency(relatedProductsData[0].basePrice)} • ADD TO BAG
+                </button>
+              </div>
+            )}
+
+            {/* Details / Fit / Fabric Pills */}
+            <div className="bg-[#f0f0f0] rounded-full p-1 flex mb-6 mt-8">
+               {(['details', 'fit', 'fabric'] as const).map(tab => (
+                 <button
+                   key={tab}
+                   onClick={() => setActiveTab(tab)}
+                   className={`flex-1 py-2 text-[11px] font-bold tracking-widest uppercase rounded-full transition-all ${
+                     activeTab === tab ? 'bg-white shadow-sm text-charcoal' : 'text-neutral-500 hover:text-charcoal'
+                   }`}
+                 >
+                   {tab}
+                 </button>
+               ))}
+            </div>
+
+            {/* Tab Content */}
+            <div className="text-[13px] text-neutral-600 leading-relaxed font-medium mb-10 min-h-[200px]">
+               {activeTab === 'details' && (
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                   <p>Go wide with on-the-pulse appeal. The {product.name} features a roomy silhouette with {featuresList.length} pockets and a super comfy waistband.</p>
+                   <p>Select colors also available in a <span className="underline underline-offset-4 decoration-neutral-300">mid rise</span> with a ruched waistband.</p>
+                   <ul className="space-y-2 mt-4 ml-4">
+                     {featuresList.map((feature, i) => (
+                       <li key={i} className="relative before:content-['•'] before:absolute before:-left-4 before:text-neutral-400">
+                         {feature}
+                       </li>
+                     ))}
+                   </ul>
+                 </motion.div>
+               )}
+               {activeTab === 'fit' && (
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                   <p>Designed for a relaxed, roomy fit. Take your normal size.</p>
+                 </motion.div>
+               )}
+               {activeTab === 'fabric' && (
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                   <p>{product.fabricDetails || '72% Polyester, 21% Rayon, 7% Spandex. Wash cold inside-out, tumble dry low.'}</p>
+                 </motion.div>
+               )}
+            </div>
+
+            {/* Help Button */}
+            <div className="fixed bottom-6 right-6 lg:absolute lg:bottom-10 lg:right-10 z-50">
+               <button className="flex items-center gap-2 bg-charcoal text-white px-5 py-2.5 rounded-full shadow-lg hover:bg-black transition-colors">
+                 <HelpCircle size={16} />
+                 <span className="text-[13px] font-bold">Help</span>
+               </button>
             </div>
 
           </div>
@@ -338,10 +486,10 @@ function ProductDetailPage() {
             className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] pb-safe"
           >
             <button
-              className={`w-full text-[13px] font-black tracking-[0.15em] uppercase py-4 transition-all shadow-md ${
+              className={`w-full text-[13px] font-bold tracking-widest uppercase py-4 transition-all shadow-md ${
                 !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
                   ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
-                  : 'bg-black text-white hover:bg-neutral-800'
+                  : 'bg-charcoal text-white hover:bg-black'
               }`}
               disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
               onClick={handleAddToCart}
@@ -355,33 +503,14 @@ function ProductDetailPage() {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* Mobile inline button (when sticky is hidden) */}
-      <div className="lg:hidden px-6 pb-12 pt-4">
-          <button
-              className={`w-full text-[13px] font-black tracking-[0.15em] uppercase py-5 transition-all shadow-md ${
-                !selectedSize || (selectedVariant && selectedVariant.inventory <= 0)
-                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
-                  : 'bg-black text-white hover:bg-neutral-800'
-              }`}
-              disabled={!selectedSize || (selectedVariant !== undefined && selectedVariant.inventory <= 0)}
-              onClick={handleAddToCart}
-            >
-              {!selectedSize
-                ? 'Select a Size'
-                : selectedVariant?.inventory === 0
-                  ? 'Waitlist Me'
-                  : `Add to Bag`}
-            </button>
-      </div>
 
-      {/* Related Products */}
-      <section className="border-t-4 border-black pt-16 pb-24 bg-[#fafafa]">
+      {/* Wear It With Section */}
+      <section className="border-t border-neutral-200 pt-16 pb-24 bg-white mt-10">
         <div className="max-w-[2000px] mx-auto px-6 lg:px-12">
-          <h2 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-black mb-10 uppercase">
-            Complete The Set
+          <h2 className="font-heading font-black text-2xl lg:text-3xl tracking-tight text-charcoal mb-10">
+            Wear It With
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-6">
             {relatedProductsData?.map((p) => (
               <ProductCard 
                 key={p.id} 
